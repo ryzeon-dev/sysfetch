@@ -299,8 +299,6 @@ if __name__ == '__main__':
             color = colors[sys.argv[colorIndex]]
 
         if 'recache' in sys.argv:
-            makeNew()
+            makeNew(True)
         else:
             printCached()
-
-
