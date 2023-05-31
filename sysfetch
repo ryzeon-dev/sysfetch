@@ -118,7 +118,7 @@ def makeNew(cached=False):
     output.append(indent + colorUnicode + 'shell: ' + white + shell + down)
     cache.append(indent + '{color_unicode}' + 'shell: ' + white + '{shell}' + down)
 
-    cpu = terminal('lscpu | grep "Model name" | awk -F \':\' \'{ print $2 }\'').strip()
+    cpu = terminal('lscpu | grep "Model name" | awk -F \':\' \'{ print $2 }\'').strip().split('\n')[0]
     output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
     cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
 
