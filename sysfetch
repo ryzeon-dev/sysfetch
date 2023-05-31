@@ -200,7 +200,10 @@ def makeNew(cached=False):
     lines = len(output)
 
     up = f'\x1b[{height - (height - lines) // 2}A\x1b[999D'
-    end = f'\x1b[9999D\x1b[{(height - lines) // 2}B'
+    if height - lines < 0:
+        end = ''
+    else:
+        end = f'\x1b[9999D\x1b[{(height - lines) // 2}B'
 
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
@@ -214,6 +217,10 @@ def makeNew(cached=False):
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
+
+    for i in range(0, height - lines):
+        output.append('\n')
+        cache.append('\n')
 
     sys.stdout.write(''.join(output))
 
