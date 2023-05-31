@@ -129,6 +129,10 @@ def makeNew(cached=False):
     output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
     cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
 
+    cpuThreads = terminal('echo $(lscpu | grep Thread | awk -F \':\' \'{ print $2 }\' && lscpu  | grep "CPU(s)" -m 1 | awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')
+    output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
+    cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
+
     try:
         cpuUsage = str(psutil.cpu_percent()) + '%'
         output.append(indent + colorUnicode + '    usage: ' + white + cpuUsage + down)
@@ -214,7 +218,7 @@ def makeNew(cached=False):
     if height - lines < 0:
         end = ''
     else:
-        end = f'\x1b[9999D\x1b[{(height - lines) // 2}B'
+        end = f'\x1b[9999D\x1b[{height - lines}B'
 
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
@@ -225,6 +229,7 @@ def makeNew(cached=False):
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
 
+    print('')
     sys.stdout.write(''.join(output))
 
     if cached:
@@ -285,6 +290,7 @@ def printCached():
         content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
         content = content.replace('{ipv4}', terminal('hostname -I'))
 
+        print('')
         sys.stdout.write(content)
 
 
