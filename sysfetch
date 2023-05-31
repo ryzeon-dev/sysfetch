@@ -225,22 +225,40 @@ def printCached():
         content = content.replace('{color_unicode_bold}', colorUnicodeBold)
         content = content.replace('{kernel}', terminal('uname -r'))
         content = content.replace('{shell}', terminal('$SHELL --version').split('\n')[0])
-        content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
-        content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) + ' C')
-        content = content.replace('{ram_usage}', str(round(float(terminal(
+        try:
+            content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
+        except: pass
+
+        try:
+            content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) + ' C')
+        except: pass
+
+        try:
+            content = content.replace('{ram_usage}', str(round(float(terminal(
             "echo $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' && cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }') | awk '{ print ($1 - $2) * 100 / $1 }'").replace(
             ',', '.')))) + '% (' + str(round(float(terminal(
             "echo $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' && cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }') | awk '{ print ($1 - $2) / 1024 / 1024 }'").replace(
             ',', '.')), 2)) + ' GB)')
-        content = content.replace('{ram_cached}', terminal(
-            'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ print $2 / 1024 " MB"}\'').strip())
-        content = content.replace('{swap_usage}', str(round(float(terminal(
-            "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print $1 ? ($1 - $2) * 100 / $1 : 0}'").replace(
-            ',', '.')))) + '% (' + str(round(float(terminal(
-            "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print ($1 - $2) / 1024 / 1024 }'").replace(
-            ',', '.')), 2)) + ' GB)')
-        content = content.replace('{swap_cached}', terminal(
-            'cat /proc/meminfo | grep SwapCached | awk \'{ print $2 / 1024 }\'').strip() + ' MB')
+        except: pass
+
+        try:
+            content = content.replace('{ram_cached}', terminal(
+                'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ print $2 / 1024 " MB"}\'').strip())
+        except: pass
+
+        try:
+            content = content.replace('{swap_usage}', str(round(float(terminal(
+                "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print $1 ? ($1 - $2) * 100 / $1 : 0}'").replace(
+                ',', '.')))) + '% (' + str(round(float(terminal(
+                "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print ($1 - $2) / 1024 / 1024 }'").replace(
+                ',', '.')), 2)) + ' GB)')
+        except: pass
+
+        try:
+            content = content.replace('{swap_cached}', terminal(
+               'cat /proc/meminfo | grep SwapCached | awk \'{ print $2 / 1024 }\'').strip() + ' MB')
+        except: pass
+
         content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
         content = content.replace('{ipv4}', terminal('hostname -I'))
 
