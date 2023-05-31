@@ -52,17 +52,17 @@ def makeNew(cached=False):
     output = []
     cache = []
 
-    osname = terminal('cat /etc/os-release | grep -w ID | awk -F \'=\' \'{ print $2 }\'').strip()
-    asciiArt = None
-
-    possible = []
-    for logo in distros.distro:
-        if logo.lower() in osname.lower():
-            possible.append(logo)
-
     if 'Android' in terminal('uname -a'):
-        possibile = 'Android'
+        possible = 'Android'
+
     else:
+        osname = terminal('cat /etc/os-release | grep -w ID | awk -F \'=\' \'{ print $2 }\'').strip()
+        possible = []
+
+        for logo in distros.distro:
+            if logo.lower() in osname.lower():
+                possible.append(logo)
+
         if not isinstance(possible, str):
             if len(possible) == 1:
                 possible = possible[0]
