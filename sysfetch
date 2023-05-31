@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+from subprocess import getoutput as terminal
 try:
     sys.path.append('/usr/share/sysfetch')
 except:
@@ -11,11 +12,9 @@ except:
 else:
     import distros
 
-try:
+if not 'Android' in terminal('uname -a'):
     import psutil
-except: pass
 
-from subprocess import getoutput as terminal
 import os
 
 HOME = terminal('echo $HOME')
