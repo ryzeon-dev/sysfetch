@@ -295,7 +295,7 @@ def printCached():
 
 
 if __name__ == '__main__':
-    color = colors['purple']
+    color = colors['aquagreen']
 
     if not '.sysfetch' in os.listdir(HOME):
         terminal(f'mkdir  {HOME}/.sysfetch')
