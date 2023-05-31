@@ -60,6 +60,9 @@ def makeNew(cached=False):
         if logo.lower() in osname.lower():
             possible.append(logo)
 
+    if 'Android' in terminal('uname -a'):
+        possibile = 'Android'
+
     if not isinstance(possible, str):
         if len(possible) == 1:
             possible = possible[0]
