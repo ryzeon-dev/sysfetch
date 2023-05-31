@@ -10,7 +10,11 @@ except:
         print('Using sysfetch out of its git directory is possible only if you executed install.sh script')
 else:
     import distros
-import psutil
+
+try:
+    import psutil
+except: pass
+
 from subprocess import getoutput as terminal
 import os
 
@@ -99,7 +103,10 @@ def makeNew(cached=False):
         '{up}' + indent + '\x1b[1D' + '{color_unicode}' + '' + white + '{color_unicode_bold} ' + '{username} ' +
         unicodeLogo + ' {hostname} ' + white + '{color_unicode}' + '' + white + down)
 
-    distro = terminal('cat /etc/os-release | grep PRETTY | awk -F \'"\' \'{print $2 }\'').strip()
+    if possible == 'Android':
+        distro = 'Android'
+    else:
+        distro = terminal('cat /etc/os-release | grep PRETTY | awk -F \'"\' \'{print $2 }\'').strip()
     output.append(indent + colorUnicode + 'os: ' + white + distro + down)
     cache.append(indent + '{color_unicode}' + 'os: ' + white + distro + down)
 
@@ -174,16 +181,18 @@ def makeNew(cached=False):
     cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{swap_cached}' + down)
 
     gpu = terminal("lspci | grep VGA | awk -F 'controller:' '{ print $2 }'").strip()
-    output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
-    cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
+    if not 'not found' in gpu:
+        output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
+        cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
 
     processes = str(len(terminal('ps axu').split('\n')) - 1)
     output.append(indent + colorUnicode + 'processes: ' + white + processes + down)
     cache.append(indent + '{color_unicode}' + 'processes: ' + white + '{processes}' + down)
 
     ipv4 = terminal('hostname -I')
-    output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
-    cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
+    if not 'invalid' in ipv4:
+        output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
+        cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
 
     output.append('{end}' + '\n')
     cache.append('{end}' + '\n')
