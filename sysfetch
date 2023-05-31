@@ -94,7 +94,7 @@ def makeNew(cached=False):
     colorUnicodeBold = f'\x1b[7;{color}'
     white = '\x1b[00m'
     indent = f'\x1b[{width}C'
-    down = '\x1b[1B\x1b[9999D'
+    down = '\n'##'\x1b[1B\x1b[9999D'
 
     output.append('{up}' + indent + '\x1b[1D' + colorUnicode + '' + white + f'{colorUnicodeBold} ' + terminal(
         'whoami') + f' {unicodeLogo} ' + terminal('uname -n') + ' ' + white + colorUnicode + '' + white + down)
@@ -179,6 +179,18 @@ def makeNew(cached=False):
     output.append(indent + colorUnicode + '    cached: ' + white + swapCached + down)
     cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{swap_cached}' + down)
 
+    try:
+        totalStorage = terminal('lsblk | grep / -w | awk \'{ print $4}\'')
+        output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
+        cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
+    except: pass
+
+    try:
+        usedStorage = terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | awk \'{ print $1 }\'')
+        output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
+        cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
+    except: pass
+
     gpu = terminal("lspci | grep VGA | awk -F 'controller:' '{ print $2 }'").strip()
     if not 'not found' in gpu:
         output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
@@ -198,7 +210,7 @@ def makeNew(cached=False):
 
     lines = len(output)
 
-    up = f'\x1b[{height - (height - lines) // 2}A\x1b[999D'
+    up = f'\x1b[{height-1}A\x1b[999D'
     if height - lines < 0:
         end = ''
     else:
@@ -207,19 +219,11 @@ def makeNew(cached=False):
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
 
-    for i in range(0, len(output) - height):
-        output.insert(0, '\n')
-        cache.insert(0, '\n')
-
     output.insert(0, colorUnicode + asciiArt + white)
     cache.insert(0, colorUnicode + asciiArt + white)
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
-
-    for i in range(0, height - lines):
-        output.append('\n')
-        cache.append('\n')
 
     sys.stdout.write(''.join(output))
 
@@ -272,6 +276,10 @@ def printCached():
         try:
             content = content.replace('{swap_cached}', terminal(
                'cat /proc/meminfo | grep SwapCached | awk \'{ print $2 / 1024 }\'').strip() + ' MB')
+        except: pass
+
+        try:
+            content = content.replace('{used_storage}', terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | awk \'{ print $1 }\''))
         except: pass
 
         content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
