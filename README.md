@@ -38,6 +38,7 @@ your device which concerns "static" data, simply use:
 ```commandline
 $ sysfetch recache
 ```
+It is a good practice to recache at least once a week.
 
 If you desire to use a color different from default one (purple), 
 you can change it by:
