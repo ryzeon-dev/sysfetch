@@ -16,6 +16,14 @@ $ ./install.sh
 The script will create a folder called "sysfetch" in "/usr/share", and will copy "distros.py" into it. \
 The "sysfetch" main script will be copied into "/usr/local/bin".
 
+It is also required to have installed the package "psutil", 
+which can be installed both by your distro's package manager or
+by pip
+
+```commandline
+$ pip install psutil
+```
+
 ### Usage
 
 ```commandline

@@ -62,10 +62,10 @@ def makeNew(cached=False):
 
     if 'Android' in terminal('uname -a'):
         possibile = 'Android'
-
-    if not isinstance(possible, str):
-        if len(possible) == 1:
-            possible = possible[0]
+    else:
+        if not isinstance(possible, str):
+            if len(possible) == 1:
+                possible = possible[0]
 
     asciiArt = distros.distro[possible][0]
     width = distros.distro[possible][1]
