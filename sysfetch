@@ -54,6 +54,7 @@ def makeNew(cached=False):
 
     if 'Android' in terminal('uname -a'):
         possible = 'Android'
+        osname = None
 
     else:
         osname = terminal('cat /etc/os-release | grep -w ID | awk -F \'=\' \'{ print $2 }\'').strip()
