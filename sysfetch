@@ -104,8 +104,11 @@ def makeNew(cached=False):
 
     if possible == 'Android':
         distro = 'Android'
+
     else:
-        distro = terminal('cat /etc/os-release | grep PRETTY | awk -F \'"\' \'{print $2 }\'').strip()
+        distro = terminal('cat /etc/issue')
+        distro = distro[0:distro.index('\\')]
+
     output.append(indent + colorUnicode + 'os: ' + white + distro + down)
     cache.append(indent + '{color_unicode}' + 'os: ' + white + distro + down)
 
@@ -196,7 +199,7 @@ def makeNew(cached=False):
     except: pass
 
     gpu = terminal("lspci | grep VGA | awk -F 'controller:' '{ print $2 }'").strip()
-    if not 'not found' in gpu:
+    if not 'not found' in gpu and not 'pcilib' in gpu:
         output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
         cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
 
@@ -231,6 +234,7 @@ def makeNew(cached=False):
 
     print('')
     sys.stdout.write(''.join(output))
+    print('')
 
     if cached:
         with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
@@ -249,6 +253,7 @@ def printCached():
         content = content.replace('{color_unicode_bold}', colorUnicodeBold)
         content = content.replace('{kernel}', terminal('uname -r'))
         content = content.replace('{shell}', terminal('$SHELL --version').split('\n')[0])
+
         try:
             content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
         except: pass
@@ -292,6 +297,7 @@ def printCached():
 
         print('')
         sys.stdout.write(content)
+        print('')
 
 
 if __name__ == '__main__':
