@@ -252,9 +252,10 @@ def makeNew(cached=False):
             file.write(''.join(cache))
 
 
-def printCached():
+def printCached(color):
     with open(HOME + '/.sysfetch/sysfetch.cache', 'r') as cache:
         content = cache.read()
+
         if conf['default-color']:
             color = colors[conf['default-color']]
 
@@ -317,12 +318,15 @@ def printCached():
 if __name__ == '__main__':
     color = colors['aquagreen']
 
+    if conf['default-color']:
+        color = colors[conf['default-color']]
+
     if not '.sysfetch' in os.listdir(HOME):
         terminal(f'mkdir  {HOME}/.sysfetch')
 
     if len(sys.argv) == 1:
-        if 'sysfetch.cache' in os.listdir(HOME + '/.sysfetch'):
-            printCached()
+        if 'sysfetch.cache' in os.listdir(HOME + '/.sysfetch') and not conf['always-recache']:
+            printCached(color)
 
         else:
             makeNew(True)
@@ -350,11 +354,8 @@ For example configutation, check at https://github.com/cpy-dev/sysfetch
             colorIndex = sys.argv.index('color') + 1
             color = colors[sys.argv[colorIndex]]
 
-        elif conf['default-color']:
-            color = colors[conf['default-color']]
-
         if 'recache' in sys.argv or conf['always-recache']:
             makeNew(True)
             
         else:
-            printCached()
+            printCached(color)
