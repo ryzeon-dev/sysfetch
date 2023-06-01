@@ -1,4 +1,7 @@
 distro = {
+    'Armbian': (
+        '      █ █ █ █ █ █ █ █ █ █ █\n     ███████████████████████\n   ▄▄██                   ██▄▄\n   ▄▄██    ███████████    ██▄▄\n   ▄▄██   ██         ██   ██▄▄\n   ▄▄██   ██         ██   ██▄▄\n   ▄▄██   ██         ██   ██▄▄\n   ▄▄██   █████████████   ██▄▄\n   ▄▄██   ██         ██   ██▄▄\n   ▄▄██   ██         ██   ██▄▄\n   ▄▄██   ██         ██   ██▄▄\n   ▄▄██                   ██▄▄\n     ███████████████████████\n      █ █ █ █ █ █ █ █ █ █ █',
+        30, 14),
     'AIX': (
         '\x1b[?25l\x1b[?7l\x1b[0m\x1b[32m\x1b[1m           `:+ssssossossss+-`\n        .oys///oyhddddhyo///sy+.\n      /yo:+hNNNNNNNNNNNNNNNNh+:oy/\n    :h/:yNNNNNNNNNNNNNNNNNNNNNNy-+h:\n  `ys.yNNNNNNNNNNNNNNNNNNNNNNNNNNy.ys\n `h+-mNNNNNNNNNNNNNNNNNNNNNNNNNNNNm-oh\n h+-NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN.oy\n/d`mNNNNNNN/::mNNNd::m+:/dNNNo::dNNNd`m:\nh//NNNNNNN: . .NNNh  mNo  od. -dNNNNN:+y\nN.sNNNNNN+ -N/ -NNh  mNNd.   sNNNNNNNo-m\nN.sNNNNNs  +oo  /Nh  mNNs` ` /mNNNNNNo-m\nh//NNNNh  ossss` +h  md- .hm/ `sNNNNN:+y\n:d`mNNN+/yNNNNNd//y//h//oNNNNy//sNNNd`m-\n yo-NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNm.ss\n `h+-mNNNNNNNNNNNNNNNNNNNNNNNNNNNNm-oy\n   sy.yNNNNNNNNNNNNNNNNNNNNNNNNNNs.yo\n    :h+-yNNNNNNNNNNNNNNNNNNNNNNs-oh-\n      :ys:/yNNNNNNNNNNNNNNNmy/:sy:\n        .+ys///osyhhhhys+///sy+.\n            -/osssossossso/-\x1b',
         43, 20),
@@ -59,6 +62,7 @@ distro = {
     'Bedrock': (
         '\x1b[?25l\x1b[?7l\x1b[38;5;8m\x1b[1m--------------------------------------\n--------------------------------------\n--------------------------------------\n---\x1b[37m\x1b[0m\x1b[1m\\\\\\\\\\\\\x1b[38;5;8m\x1b[1m-----------------------\n----\x1b[37m\x1b[0m\x1b[1m\\\\      \\\\\x1b[38;5;8m\x1b[1m----------------------\n-----\x1b[37m\x1b[0m\x1b[1m\\\\      \\\\\x1b[38;5;8m\x1b[1m---------------------\n------\x1b[37m\x1b[0m\x1b[1m\\\\      \\\\\\\\\\\\\\\\\\\x1b[38;5;8m\x1b[1m------\n-------\x1b[37m\x1b[0m\x1b[1m\\\\                    \\\\\x1b[38;5;8m\x1b[1m-----\n--------\x1b[37m\x1b[0m\x1b[1m\\\\                    \\\\\x1b[38;5;8m\x1b[1m----\n---------\x1b[37m\x1b[0m\x1b[1m\\\\        ______      \\\\\x1b[38;5;8m\x1b[1m---\n----------\x1b[37m\x1b[0m\x1b[1m\\\\                   ///\x1b[38;5;8m\x1b[1m---\n-----------\x1b[37m\x1b[0m\x1b[1m\\\\                 ///\x1b[38;5;8m\x1b[1m----\n------------\x1b[37m\x1b[0m\x1b[1m\\\\               ///\x1b[38;5;8m\x1b[1m-----\n-------------\x1b[37m\x1b[0m\x1b[1m\\\\////////////////\x1b[38;5;8m\x1b[1m------\n--------------------------------------\n--------------------------------------\n--------------------------------------\x1b',
         59, 17),
+
     'Bitrig': (
         '\x1b[?25l\x1b[?7l\x1b[0m\x1b[32m\x1b[1m   `hMMMMN+\n   -MMo-dMd`\n   oMN- oMN`\n   yMd  /NM:\n  .mMmyyhMMs\n  :NMMMhsmMh\n  +MNhNNoyMm-\n  hMd.-hMNMN:\n  mMmsssmMMMo\n .MMdyyhNMMMd\n oMN.`/dMddMN`\n yMm/hNm+./MM/\n.dMMMmo.``.NMo\n:NMMMNmmmmmMMh\n/MN/-------oNN:\nhMd.       .dMh\nsm/         /ms\x1b',
         25, 17),
