@@ -70,7 +70,7 @@ located in "$HOME/.sysfetch/conf.json". Example configuration:
 
 ```json
 {
-  "ascii-art" : "Debian",
+  "ascii-art" : "debian",
   "separator-unicode" : "debian",
   "default-color" : "aquagreen",
   "always-recache" : false
@@ -103,6 +103,7 @@ Available separator unicode:
 - mandriva
 - mangeia
 - devuan
+- tux
 
 Available colors:
 - grey
@@ -116,183 +117,184 @@ Available colors:
 - aquagreen
 
 Available ascii-art:
-- AIX
-- Alpine
-- AlterLinux
-- Anarchy
-- Android
-- Antergos
-- antiX
-- "AOSC OS"
-- "AOSC OS/Retro"
-- Apricity
-- ArcoLinux
-- ArchBox
-- ARCHlabs
-- ArchStrike
-- XFerience
-- ArchMerge
-- Arch
-- Artix
-- Arya
-- Bedrock
-- Bitrig
-- BlackArch
-- BLAG
-- BlankOn
-- BlueLight
-- bonsai
-- BSD,BunsenLabs
-- Calculate
-- Carbs
-- CentOS
-- Chakra
-- ChaletOS
-- Chapeau
-- Chrom
-- Cleanjaro
-- ClearOS
-- Clear_Linux
-- Clover
-- Condres
-- Container_Linux
-- CRUX
-- Cucumber
-- Debian
-- Deepin
-- DesaOS
-- Devuan
-- DracOS
-- DarkOs
-- DragonFly
-- Drauger
-- Elementary
-- EndeavourOS
-- Endless
-- EuroLinux
-- Exherbo
-- Fedora
-- Feren
-- FreeBSD
-- FreeMiNT
-- Frugalware
-- Funtoo
-- GalliumOS
-- Garuda
-- Gentoo
-- Pentoo
-- gNewSense
-- GNOME
-- GNU
-- GoboLinux
-- Grombyang
-- Guix
-- Haiku
-- Huayra
-- Hyperbola
-- janus
-- Kali
-- KaOS
-- KDE_neon
-- Kibojoe
-- Kogaion
-- Korora
-- KSLinux
-- Kubuntu
-- LEDE
-- LFS
-- Linux_Lite
-- LMDE
-- Lubuntu
-- Lunar
-- macos
-- Mageia
-- MagpieOS
-- Mandriva
-- Manjaro
-- Maui
-- Mer
-- Minix
-- LinuxMint
-- MX_Linux
-- Namib
-- Neptune
-- NetBSD
-- Netrunner
-- Nitrux
-- NixOS
-- Nurunner
-- NuTyX
-- OBRevenge
-- OpenBSD
-- openEuler
-- OpenIndiana
-- openmamba
-- OpenMandriva
-- OpenStage
-- OpenWrt
-- osmc
-- Oracle
-- OS Elbrus
-- PacBSD
-- Parabola
-- Pardus
-- Parrot
-- Parsix
-- TrueOS
-- PCLinuxOS
-- Peppermint
-- popos
-- Porteus
-- PostMarketOS
-- Proxmox
-- Puppy
-- PureOS
-- Qubes
-- Radix
-- Raspbian
-- Reborn_OS
-- Redstar
-- Redcore
-- Redhat
-- Refracted_Devuan
-- Regata
-- Rosa
-- sabotage
-- Sabayon
-- Sailfish
-- SalentOS
-- Scientific
-- Septor
-- SereneLinux
-- SharkLinux
-- Siduction
-- Slackware
-- SliTaz
-- SmartOS
-- Solus
-- Source_Mage
-- Sparky
-- Star
-- SteamOS
-- SunOS
-- openSUSE_Leap
-- openSUSE_Tumbleweed
-- openSUSE
-- SwagArch
-- Tails
-- Trisquel
-- Ubuntu-Budgie
-- Ubuntu-GNOME
-- Ubuntu-MATE
-- Ubuntu-Studio
-- Ubuntu
-- Venom
-- Void
-- Obarun
-- windows10
-- Windows7
-- Xubuntu
-- Zorin
-- IRIX
-    
+ - armbian
+ - aix
+ - alpine
+ - alterlinux
+ - anarchy
+ - android
+ - antergos
+ - antix
+ - aosc os
+ - aosc os/retro
+ - apricity
+ - arcolinux
+ - archbox
+ - archlabs
+ - archstrike
+ - xferience
+ - archmerge
+ - arch
+ - artix
+ - arya
+ - bedrock
+ - bitrig
+ - blackarch
+ - blag
+ - blankon
+ - bluelight
+ - bonsai
+ - bsd,bunsenlabs
+ - calculate
+ - carbs
+ - centos
+ - chakra
+ - chaletos
+ - chapeau
+ - chrom
+ - cleanjaro
+ - clearos
+ - clear_linux
+ - clover
+ - condres
+ - container_linux
+ - crux
+ - cucumber
+ - debian
+ - deepin
+ - desaos
+ - devuan
+ - dracos
+ - darkos
+ - dragonfly
+ - drauger
+ - elementary
+ - endeavouros
+ - endless
+ - eurolinux
+ - exherbo
+ - fedora
+ - feren
+ - freebsd
+ - freemint
+ - frugalware
+ - funtoo
+ - galliumos
+ - garuda
+ - gentoo
+ - pentoo
+ - gnewsense
+ - gnome
+ - gnu
+ - gobolinux
+ - grombyang
+ - guix
+ - haiku
+ - huayra
+ - hyperbola
+ - janus
+ - kali
+ - kaos
+ - kde_neon
+ - kibojoe
+ - kogaion
+ - korora
+ - kslinux
+ - kubuntu
+ - lede
+ - lfs
+ - linux_lite
+ - lmde
+ - lubuntu
+ - lunar
+ - macos
+ - mageia
+ - magpieos
+ - mandriva
+ - manjaro
+ - maui
+ - mer
+ - minix
+ - linuxmint
+ - mx_linux
+ - namib
+ - neptune
+ - netbsd
+ - netrunner
+ - nitrux
+ - nixos
+ - nurunner
+ - nutyx
+ - obrevenge
+ - openbsd
+ - openeuler
+ - openindiana
+ - openmamba
+ - openmandriva
+ - openstage
+ - openwrt
+ - osmc
+ - oracle
+ - os elbrus
+ - pacbsd
+ - parabola
+ - pardus
+ - parrot
+ - parsix
+ - trueos
+ - pclinuxos
+ - peppermint
+ - popos
+ - porteus
+ - postmarketos
+ - proxmox
+ - puppy
+ - pureos
+ - qubes
+ - radix
+ - raspbian
+ - reborn_os
+ - redstar
+ - redcore
+ - redhat
+ - refracted_devuan
+ - regata
+ - rosa
+ - sabotage
+ - sabayon
+ - sailfish
+ - salentos
+ - scientific
+ - septor
+ - serenelinux
+ - sharklinux
+ - siduction
+ - slackware
+ - slitaz
+ - smartos
+ - solus
+ - source_mage
+ - sparky
+ - star
+ - steamos
+ - sunos
+ - opensuse_leap
+ - opensuse_tumbleweed
+ - opensuse
+ - swagarch
+ - tails
+ - trisquel
+ - ubuntu-budgie
+ - ubuntu-gnome
+ - ubuntu-mate
+ - ubuntu-studio
+ - ubuntu
+ - venom
+ - void
+ - obarun
+ - windows10
+ - windows7
+ - xubuntu
+ - zorin
+ - irix
+ - tux

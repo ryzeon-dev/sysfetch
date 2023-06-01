@@ -42,6 +42,7 @@ unicodes = {
     'mandriva': '\uF311',
     'mageia': '\uF310',
     'devuan': '\uF307',
+    'tux' : '\uF31A'
 }
 
 colors = {
@@ -63,34 +64,28 @@ def makeNew(cached=False):
     output = []
     cache = []
 
+    asciiArt = 'tux'
+
     if 'Android' in terminal('uname -a'):
-        possible = 'Android'
+        asciiArt = 'android'
         osname = None
 
     else:
-        osname = terminal('cat /etc/os-release | grep -w ID | awk -F \'=\' \'{ print $2 }\'').strip()
-        osSpecific = terminal('cat /etc/issue').strip().split(' ')[0]
-        possible = []
+        osname = terminal('cat /etc/os-release | grep -w ID | awk -F \'=\' \'{ print $2 }\'').strip().lower()
+        osSpecific = terminal('cat /etc/issue').strip().split(' ')[0].lower()
 
-        if osSpecific.lower() in map(low, distros.distro.keys()):
-            for logo in distros.distro:
-                if logo.lower() in osSpecific.lower():
-                    possible.append(logo)
+        if osSpecific in distros.distro.keys():
+            asciiArt = osSpecific
         else:
-            for logo in distros.distro:
-                if logo.lower() in osname.lower():
-                    possible.append(logo)
-
-        if not isinstance(possible, str):
-            if len(possible) == 1:
-                possible = possible[0]
+            if osname in distros.distro.keys():
+                asciiArt = osname
 
     if conf['ascii-art']:
-        possible = conf['ascii-art']
+        asciiArt = conf['ascii-art']
 
-    asciiArt = distros.distro[possible][0]
-    width = distros.distro[possible][1]
-    height = distros.distro[possible][2]
+    asciiLogo = distros.distro[asciiArt][0]
+    width = distros.distro[asciiArt][1]
+    height = distros.distro[asciiArt][2]
 
     if conf['separator-unicode']:
         unicodeLogo = unicodes[conf['separator-unicode']]
@@ -122,7 +117,7 @@ def makeNew(cached=False):
         '{up}' + indent + '\x1b[1D' + '{color_unicode}' + '' + white + '{color_unicode_bold} ' + '{username} ' +
         unicodeLogo + ' {hostname} ' + white + '{color_unicode}' + '' + white + down)
 
-    if possible == 'Android':
+    if asciiArt == 'Android':
         distro = 'Android'
 
     else:
@@ -246,8 +241,8 @@ def makeNew(cached=False):
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
 
-    output.insert(0, colorUnicode + asciiArt + white)
-    cache.insert(0, colorUnicode + asciiArt + white)
+    output.insert(0, colorUnicode + asciiLogo + white)
+    cache.insert(0, colorUnicode + asciiLogo + white)
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
