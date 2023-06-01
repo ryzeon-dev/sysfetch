@@ -6,8 +6,6 @@ Features hardware and operative system centered information.
 
 Inspired by Neofetch and PowerLevel10k
 
-Currently still in beta-testing phase. Feel free to test the software and report any bad behaviour 
-
 ### Install 
 To install sysfetch in your system, you need to execute "install.sh" file with root privilegies:
 
