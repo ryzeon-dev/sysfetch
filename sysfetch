@@ -56,6 +56,9 @@ colors = {
     'aquagreen': '96m'
 }
 
+def low(string):
+    return string.lower()
+
 def makeNew(cached=False):
     output = []
     cache = []
@@ -66,11 +69,17 @@ def makeNew(cached=False):
 
     else:
         osname = terminal('cat /etc/os-release | grep -w ID | awk -F \'=\' \'{ print $2 }\'').strip()
+        osSpecific = terminal('cat /etc/issue').strip().split(' ')[0]
         possible = []
 
-        for logo in distros.distro:
-            if logo.lower() in osname.lower():
-                possible.append(logo)
+        if osSpecific.lower() in map(low, distros.distro.keys()):
+            for logo in distros.distro:
+                if logo.lower() in osSpecific.lower():
+                    possible.append(logo)
+        else:
+            for logo in distros.distro:
+                if logo.lower() in osname.lower():
+                    possible.append(logo)
 
         if not isinstance(possible, str):
             if len(possible) == 1:
