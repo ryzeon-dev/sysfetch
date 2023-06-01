@@ -6,7 +6,7 @@ Features hardware and operative system centered information.
 
 Inspired by Neofetch and PowerLevel10k
 
-### Install 
+## Install 
 To install sysfetch in your system, you need to execute "install.sh" file with root privilegies:
 
 ```commandline
@@ -24,7 +24,7 @@ by pip
 $ pip install psutil
 ```
 
-### Usage
+## Usage
 
 ```commandline
 $ sysfetch
