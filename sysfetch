@@ -2,9 +2,19 @@
 
 import sys
 from subprocess import getoutput as terminal
+
+if not 'Android' in terminal('uname -a'):
+    import psutil
+
+import os
+import json
+
+HOME = terminal('echo $HOME')
+
 try:
     sys.path.append('/usr/share/sysfetch')
 except:
+    conf = json.load(open('conf.json', 'r'))
     try:
         import distros
     except:
@@ -12,12 +22,7 @@ except:
 else:
     import distros
 
-if not 'Android' in terminal('uname -a'):
-    import psutil
-
-import os
-
-HOME = terminal('echo $HOME')
+    conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
 
 unicodes = {
     'alpine': '\uF300',
@@ -71,24 +76,30 @@ def makeNew(cached=False):
             if len(possible) == 1:
                 possible = possible[0]
 
+    if conf['ascii-art']:
+        possible = conf['ascii-art']
+
     asciiArt = distros.distro[possible][0]
     width = distros.distro[possible][1]
     height = distros.distro[possible][2]
 
-    unicodeLogo = '\uF31A'
-    if osname in unicodes.keys():
-        for key in unicodes:
-            if key.lower() in osname.lower():
-                unicodeLogo = unicodes[key]
+    if conf['separator-unicode']:
+        unicodeLogo = unicodes[conf['separator-unicode']]
     else:
-        try:
-            osLike = terminal('cat /etc/os-release | grep -w ID_LIKE | awk -F \'=\' \'{ print $2 }\'')
-        except:
-            pass
-        else:
+        unicodeLogo = '\uF31A'
+        if osname in unicodes.keys():
             for key in unicodes:
-                if key.lower() in osLike.lower():
+                if key.lower() in osname.lower():
                     unicodeLogo = unicodes[key]
+        else:
+            try:
+                osLike = terminal('cat /etc/os-release | grep -w ID_LIKE | awk -F \'=\' \'{ print $2 }\'')
+            except:
+                pass
+            else:
+                for key in unicodes:
+                    if key.lower() in osLike.lower():
+                        unicodeLogo = unicodes[key]
 
     colorUnicode = f'\x1b[1;{color}'
     colorUnicodeBold = f'\x1b[7;{color}'
@@ -240,6 +251,9 @@ def makeNew(cached=False):
 def printCached():
     with open(HOME + '/.sysfetch/sysfetch.cache', 'r') as cache:
         content = cache.read()
+        if conf['default-color']:
+            color = colors[conf['default-color']]
+
         colorUnicode = f'\x1b[1;{color}'
         colorUnicodeBold = f'\x1b[7;{color}'
 
@@ -308,11 +322,33 @@ if __name__ == '__main__':
             makeNew(True)
 
     else:
+        if '--help' in sys.argv or '-h' in sys.argv:
+            print('''sysfetch [options] [arguments]
+
+Command line system information tool written in Python
+
+Options:
+    recache             makes new cache file updating all static data 
+    color               allows to set the color of teh text output 
+    --help              show this message and exit
+
+Colors:
+    red, yellow, grey, purple, green, lightblue, blue, orange, aquagreen (default)
+    
+To set a standard behaviuor, edit the file "conf.json" located in $HOME/.sysfetch/conf.json.
+For example configutation, check at https://github.com/cpy-dev/sysfetch
+            ''')
+            sys.exit(0)
+        
         if 'color' in sys.argv:
             colorIndex = sys.argv.index('color') + 1
             color = colors[sys.argv[colorIndex]]
 
-        if 'recache' in sys.argv:
+        elif conf['default-color']:
+            color = colors[conf['default-color']]
+
+        if 'recache' in sys.argv or conf['always-recache']:
             makeNew(True)
+            
         else:
             printCached()
