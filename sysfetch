@@ -8,6 +8,7 @@ if not 'Android' in terminal('uname -a'):
 
 import os
 import json
+import time
 
 HOME = terminal('echo $HOME')
 
@@ -56,9 +57,6 @@ colors = {
     'orange': '33m',
     'aquagreen': '96m'
 }
-
-def low(string):
-    return string.lower()
 
 def makeNew():
     output = []
@@ -111,6 +109,14 @@ def makeNew():
 
                     if key.lower() in osLike.lower():
                         unicodeLogo = unicodes[key]
+
+    try:
+        sent = psutil.net_io_counters().bytes_sent
+        recv = psutil.net_io_counters().bytes_recv
+        written = psutil.disk_io_counters().write_bytes
+        red = psutil.disk_io_counters().read_bytes
+        before = time.time()
+    except: pass
 
     colorUnicode = f'\x1b[1;{color}'
     colorUnicodeBold = f'\x1b[7;{color}'
@@ -234,6 +240,37 @@ def makeNew():
         output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
         cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
 
+    try:
+        now = time.time()
+        sentNow = psutil.net_io_counters().bytes_sent
+        recvNow = psutil.net_io_counters().bytes_recv
+        writtenNow = psutil.disk_io_counters().write_bytes
+        redNow = psutil.disk_io_counters().read_bytes
+    except:
+        pass
+    else:
+        output.append(indent + colorUnicode + 'network speed: ' + white + down)
+        cache.append(indent + colorUnicode + 'network speed: ' + white + down)
+        output.append(
+            indent + colorUnicode + '    upload: ' + white + str(round((sentNow-sent) / (now - before) / 1024, 2)) + ' kBps' + down)
+        cache.append(
+            indent + colorUnicode + '    upload: ' + white + '{upload}' + ' kBps' + down)
+        output.append(
+            indent + colorUnicode + '    download: ' + white + str(round((recvNow - recv) / (now - before) / 1024, 2)) + ' kBps' + down)
+        cache.append(
+            indent + colorUnicode + '    download: ' + white + '{download}' + ' kBps' + down)
+
+        output.append(indent + colorUnicode + 'disk speed: ' + white + down)
+        cache.append(indent + colorUnicode + 'disk speed: ' + white + down)
+        output.append(
+            indent + colorUnicode + '    writing: ' + white + str(round((writtenNow - written) / (now - before) / 1024, 2)) + ' kBps' + down)
+        cache.append(
+            indent + colorUnicode + '    writing: ' + white + '{writing}' + ' kBps' + down)
+        output.append(
+            indent + colorUnicode + '    reading: ' + white + str(round((redNow - red) / (now - before) / 1024, 2)) + ' kBps' + down)
+        cache.append(
+            indent + colorUnicode + '    reading: ' + white + '{reading}' + ' kBps' + down)
+
     output.append('{end}' + '\n')
     cache.append('{end}' + '\n')
 
@@ -264,6 +301,16 @@ def makeNew():
 
 def printCached(color):
     with open(HOME + '/.sysfetch/sysfetch.cache', 'r') as cache:
+
+        try:
+            sent = psutil.net_io_counters().bytes_sent
+            recv = psutil.net_io_counters().bytes_recv
+            written = psutil.disk_io_counters().write_bytes
+            red = psutil.disk_io_counters().read_bytes
+            before = time.time()
+        except:
+            pass
+
         content = cache.read()
 
         if conf['default-color']:
@@ -320,6 +367,22 @@ def printCached(color):
         content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
         content = content.replace('{ipv4}', terminal('hostname -I'))
 
+        try:
+            now = time.time()
+            sentNow = psutil.net_io_counters().bytes_sent
+            recvNow = psutil.net_io_counters().bytes_recv
+            writtenNow = psutil.disk_io_counters().write_bytes
+            redNow = psutil.disk_io_counters().read_bytes
+
+        except:
+            pass
+
+        else:
+            content = content.replace('{upload}', str(round((sentNow - sent) / (now - before) / 1024, 2)))
+            content = content.replace('{download}', str(round((recvNow - recv) / (now - before) / 1024, 2)))
+            content = content.replace('{writing}', str(round((writtenNow - written) / (now - before) / 1024, 2)))
+            content = content.replace('{reading}', str(round((redNow - red) / (now - before) / 1024, 2)))
+
         print('')
         sys.stdout.write(content)
         print('')
@@ -350,7 +413,7 @@ Command line system information tool written in Python
 Options:
     recache             makes new cache file updating all static data 
     color               allows to set the color of teh text output 
-    --help              show this message and exit
+    --help, -h          show this message and exit
 
 Colors:
     red, yellow, grey, purple, green, lightblue, blue, orange, aquagreen (default)
