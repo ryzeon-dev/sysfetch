@@ -60,7 +60,7 @@ colors = {
 def low(string):
     return string.lower()
 
-def makeNew(cached=False):
+def makeNew():
     output = []
     cache = []
 
@@ -76,6 +76,7 @@ def makeNew(cached=False):
 
         if osSpecific in distros.distro.keys():
             asciiArt = osSpecific
+
         else:
             if osname in distros.distro.keys():
                 asciiArt = osname
@@ -89,19 +90,25 @@ def makeNew(cached=False):
 
     if conf['separator-unicode']:
         unicodeLogo = unicodes[conf['separator-unicode']]
+
     else:
         unicodeLogo = '\uF31A'
         if osname in unicodes.keys():
+
             for key in unicodes:
                 if key.lower() in osname.lower():
                     unicodeLogo = unicodes[key]
+
         else:
             try:
                 osLike = terminal('cat /etc/os-release | grep -w ID_LIKE | awk -F \'=\' \'{ print $2 }\'')
+
             except:
                 pass
+
             else:
                 for key in unicodes:
+
                     if key.lower() in osLike.lower():
                         unicodeLogo = unicodes[key]
 
@@ -109,7 +116,7 @@ def makeNew(cached=False):
     colorUnicodeBold = f'\x1b[7;{color}'
     white = '\x1b[00m'
     indent = f'\x1b[{width}C'
-    down = '\n'##'\x1b[1B\x1b[9999D'
+    down = '\n'
 
     output.append('{up}' + indent + '\x1b[1D' + colorUnicode + '' + white + f'{colorUnicodeBold} ' + terminal(
         'whoami') + f' {unicodeLogo} ' + terminal('uname -n') + ' ' + white + colorUnicode + '' + white + down)
@@ -251,9 +258,8 @@ def makeNew(cached=False):
     sys.stdout.write(''.join(output))
     print('')
 
-    if cached:
-        with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
-            file.write(''.join(cache))
+    with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
+        file.write(''.join(cache))
 
 
 def printCached(color):
@@ -333,7 +339,7 @@ if __name__ == '__main__':
             printCached(color)
 
         else:
-            makeNew(True)
+            makeNew()
 
     else:
         if '--help' in sys.argv or '-h' in sys.argv:
@@ -349,8 +355,8 @@ Options:
 Colors:
     red, yellow, grey, purple, green, lightblue, blue, orange, aquagreen (default)
     
-To set a standard behaviuor, edit the file "conf.json" located in $HOME/.sysfetch/conf.json.
-For example configutation, check at https://github.com/cpy-dev/sysfetch
+To set a standard behaviuor, edit the file "conf.json" located in $HOME/.sysfetch/conf.json
+For an example configutation, check at https://github.com/cpy-dev/sysfetch
             ''')
             sys.exit(0)
         
@@ -359,7 +365,7 @@ For example configutation, check at https://github.com/cpy-dev/sysfetch
             color = colors[sys.argv[colorIndex]]
 
         if 'recache' in sys.argv or conf['always-recache']:
-            makeNew(True)
+            makeNew()
             
         else:
             printCached(color)
