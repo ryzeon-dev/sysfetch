@@ -34,6 +34,7 @@ unicodes = {
     'parrot': '\uF329',
     'endeavour': '\uF322',
     'raspbian': '\uF315',
+    'fedora' : '\uF30A',
     'manjaro': '\uF312',
     'centos': '\uF304',
     'opensuse': '\uF314',
