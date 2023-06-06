@@ -23,8 +23,12 @@ except:
 else:
     import distros
 
-conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
-show = conf['show']
+try:
+    conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
+    show = conf['show']
+except:
+    print('Can\'t read conf.json, please execute "install.sh" script to install or update the software')
+    sys.exit(0)
 
 unicodes = {
     'alpine': '\uF300',
@@ -158,7 +162,7 @@ def makeNew():
         output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
         cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
 
-        if show['cpu-arch']:
+        if show['cpu-architecture']:
             cpuarch = terminal('lscpu | grep Arch | awk -F \':\' \'{ print $2 }\'').strip()
             output.append(indent + colorUnicode + '    architecture: ' + white + cpuarch + down)
             cache.append(indent + '{color_unicode}' + '    architecture: ' + white + cpuarch + down)
