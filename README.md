@@ -76,9 +76,38 @@ located in "$HOME/.sysfetch/conf.json". Example configuration:
   "ascii-art" : "debian",
   "separator-unicode" : "debian",
   "default-color" : "aquagreen",
-  "always-recache" : false
+  "always-recache" : false,
+  "show" : {
+    "os" : true,
+    "kernel" : true,
+    "shell" : true,
+    "cpu" : true,
+    "cpu-architecture" : true,
+    "cpu-cores" : true,
+    "cpu-threads" : true,
+    "cpu-usage" : true,
+    "cpu-temperature" : true,
+    "ram" : true,
+    "ram-usage" : true,
+    "ram-cached" : true,
+    "swap" : true,
+    "swap-usage" : true,
+    "swap-cached" : true, 
+    "storage" : true,
+    "storage-usage" : true,
+    "gpu" : true,
+    "processes" : true,
+    "ipv4" : true,
+    "network-speed" : true, 
+    "upload-speed" : true,
+    "download-speed" : true,
+    "disk-speed" : true,
+    "writing-speed" : true,
+    "reading-speed" : true
+  }
 }
 ```
+Setting as false any of the values in "show" section, removes the corresponding element from the displayed information.
 
 Leave blank if you want to keep the standard behaviour.
 

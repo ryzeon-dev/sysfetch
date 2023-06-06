@@ -23,7 +23,8 @@ except:
 else:
     import distros
 
-    conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
+conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
+show = conf['show']
 
 unicodes = {
     'alpine': '\uF300',
@@ -128,111 +129,131 @@ def makeNew():
         '{up}' + indent + '\x1b[1D' + '{color_unicode}' + '' + white + '{color_unicode_bold} ' + '{username} ' +
         unicodeLogo + ' {hostname} ' + white + '{color_unicode}' + '' + white + down)
 
-    if asciiArt == 'Android':
-        distro = 'Android'
+    if show['os']:
+        if asciiArt == 'Android':
+            distro = 'Android'
 
-    else:
-        distro = terminal('cat /etc/issue')
-        distro = distro[0:distro.index('\\')]
+        else:
+            distro = terminal('cat /etc/issue')
+            distro = distro[0:distro.index('\\')]
 
-        if not distro.strip():
-            distro = terminal('cat /etc/os-release | grep PRETTY_NAME | awk -F \'"\' \'{ print $2 }\'')
+            if not distro.strip():
+                distro = terminal('cat /etc/os-release | grep PRETTY_NAME | awk -F \'"\' \'{ print $2 }\'')
 
-    output.append(indent + colorUnicode + 'os: ' + white + distro + down)
-    cache.append(indent + '{color_unicode}' + 'os: ' + white + distro + down)
+        output.append(indent + colorUnicode + 'os: ' + white + distro + down)
+        cache.append(indent + '{color_unicode}' + 'os: ' + white + distro + down)
 
-    kernel = terminal('uname -r')
-    output.append(indent + colorUnicode + 'kernel: ' + white + kernel + down)
-    cache.append(indent + '{color_unicode}' + 'kernel: ' + white + '{kernel}' + down)
+    if show['kernel']:
+        kernel = terminal('uname -r')
+        output.append(indent + colorUnicode + 'kernel: ' + white + kernel + down)
+        cache.append(indent + '{color_unicode}' + 'kernel: ' + white + '{kernel}' + down)
 
-    shell = terminal('$SHELL --version').split('\n')[0]
-    output.append(indent + colorUnicode + 'shell: ' + white + shell + down)
-    cache.append(indent + '{color_unicode}' + 'shell: ' + white + '{shell}' + down)
+    if show['shell']:
+        shell = terminal('$SHELL --version').split('\n')[0]
+        output.append(indent + colorUnicode + 'shell: ' + white + shell + down)
+        cache.append(indent + '{color_unicode}' + 'shell: ' + white + '{shell}' + down)
 
-    cpu = terminal('lscpu | grep "Model name" | awk -F \':\' \'{ print $2 }\'').strip().split('\n')[0]
-    output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
-    cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
+    if show['cpu']:
+        cpu = terminal('lscpu | grep "Model name" | awk -F \':\' \'{ print $2 }\'').strip().split('\n')[0]
+        output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
+        cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
 
-    cpuarch = terminal('lscpu | grep Arch | awk -F \':\' \'{ print $2 }\'').strip()
-    output.append(indent + colorUnicode + '    architecture: ' + white + cpuarch + down)
-    cache.append(indent + '{color_unicode}' + '    architecture: ' + white + cpuarch + down)
+        if show['cpu-arch']:
+            cpuarch = terminal('lscpu | grep Arch | awk -F \':\' \'{ print $2 }\'').strip()
+            output.append(indent + colorUnicode + '    architecture: ' + white + cpuarch + down)
+            cache.append(indent + '{color_unicode}' + '    architecture: ' + white + cpuarch + down)
 
-    cpuCores = terminal('lscpu | grep "CPU(s)" -m 1 | awk -F \':\' \'{ print $2 }\'').strip()
-    output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
-    cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
+        if show['cpu-cores']:
+            cpuCores = terminal('lscpu | grep "CPU(s)" -m 1 | awk -F \':\' \'{ print $2 }\'').strip()
+            output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
+            cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
 
-    cpuThreads = terminal('echo $(lscpu | grep Thread | awk -F \':\' \'{ print $2 }\' && lscpu  | grep "CPU(s)" -m 1 |'
-                          ' awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')
-    output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
-    cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
+        if show['cpu-threads']:
+            cpuThreads = terminal('echo $(lscpu | grep Thread | awk -F \':\' \'{ print $2 }\' && lscpu  | grep "CPU(s)" -m 1 |'
+                                  ' awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')
+            output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
+            cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
 
-    try:
-        cpuUsage = str(psutil.cpu_percent()) + '%'
-        output.append(indent + colorUnicode + '    usage: ' + white + cpuUsage + down)
-        cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{cpu_usage}' + down)
-    except:
-        pass
+        if show['cpu-usage']:
+            try:
+                cpuUsage = str(psutil.cpu_percent()) + '%'
+                output.append(indent + colorUnicode + '    usage: ' + white + cpuUsage + down)
+                cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{cpu_usage}' + down)
+            except:
+                pass
 
-    try:
-        cpuTemp = str(psutil.sensors_temperatures()['coretemp'][0].current) + ' C'
-        output.append(indent + colorUnicode + '    temperature: ' + white + cpuTemp + down)
-        cache.append(indent + '{color_unicode}' + '    temperature: ' + white + '{cpu_temperature}' + down)
-    except:
-        pass
+        if show['cpu-temp']:
+            try:
+                cpuTemp = str(psutil.sensors_temperatures()['coretemp'][0].current) + ' C'
+                output.append(indent + colorUnicode + '    temperature: ' + white + cpuTemp + down)
+                cache.append(indent + '{color_unicode}' + '    temperature: ' + white + '{cpu_temperature}' + down)
+            except:
+                pass
 
-    ram = terminal('cat /proc/meminfo | grep MemTotal | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'')+ ' GB'
-    output.append(indent + colorUnicode + 'ram: ' + white + ram + down)
-    cache.append(indent + '{color_unicode}' + 'ram: ' + white + ram + down)
+    if show['ram']:
+        ram = terminal('cat /proc/meminfo | grep MemTotal | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'')+ ' GB'
+        output.append(indent + colorUnicode + 'ram: ' + white + ram + down)
+        cache.append(indent + '{color_unicode}' + 'ram: ' + white + ram + down)
 
-    ramUsage = terminal('echo $(cat /proc/meminfo | grep MemTotal | awk \'{ print $2 }\' && cat /proc/meminfo |'
-                        ' grep MemAvailable | awk \'{ print $2 }\') | awk \'{ printf \"%d %s (%.2f GB)\", ($1 - $2) *'
-                        ' 100 / $1, "%", ($1 -$2) / 1024 / 1024 }\'')
-    output.append(indent + colorUnicode + '    usage: ' + white + ramUsage + down)
-    cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{ram_usage}' + down)
+        if show['ram-usage']:
+            ramUsage = terminal('echo $(cat /proc/meminfo | grep MemTotal | awk \'{ print $2 }\' && cat /proc/meminfo |'
+                                ' grep MemAvailable | awk \'{ print $2 }\') | awk \'{ printf \"%d %s (%.2f GB)\", ($1 - $2) *'
+                                ' 100 / $1, "%", ($1 -$2) / 1024 / 1024 }\'')
+            output.append(indent + colorUnicode + '    usage: ' + white + ramUsage + down)
+            cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{ram_usage}' + down)
 
-    ramCached = terminal('cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip()
-    output.append(indent + colorUnicode + '    cached: ' + white + ramCached + down)
-    cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{ram_cached}' + down)
+        if show['ram-cached']:
+            ramCached = terminal('cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip()
+            output.append(indent + colorUnicode + '    cached: ' + white + ramCached + down)
+            cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{ram_cached}' + down)
 
-    swap = terminal('cat /proc/meminfo | grep "SwapTotal" | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'') + ' GB'
-    output.append(indent + colorUnicode + 'swap: ' + white + swap + down)
-    cache.append(indent + '{color_unicode}' + 'swap: ' + white + swap + down)
+    if show['swap']:
+        swap = terminal('cat /proc/meminfo | grep "SwapTotal" | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'') + ' GB'
+        output.append(indent + colorUnicode + 'swap: ' + white + swap + down)
+        cache.append(indent + '{color_unicode}' + 'swap: ' + white + swap + down)
 
-    swapUsage = terminal('echo $(cat /proc/meminfo | grep SwapTotal | awk \'{ print $2 }\' && cat /proc/meminfo | '
-                         'grep SwapFree | awk \'{ print $2 }\') | awk \'{ printf "%d%s (%.2f GB)", $1 ? ($1 - $2) * 100'
-                         ' / $1 : 0, "%", ($1 -$2) / 1024 / 1024 }\'')
-    output.append(indent + colorUnicode + '    usage: ' + white + swapUsage + down)
-    cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{swap_usage}' + down)
+        if show['swap-usage']:
+            swapUsage = terminal('echo $(cat /proc/meminfo | grep SwapTotal | awk \'{ print $2 }\' && cat /proc/meminfo | '
+                                 'grep SwapFree | awk \'{ print $2 }\') | awk \'{ printf "%d%s (%.2f GB)", $1 ? ($1 - $2) * 100'
+                                 ' / $1 : 0, "%", ($1 -$2) / 1024 / 1024 }\'')
+            output.append(indent + colorUnicode + '    usage: ' + white + swapUsage + down)
+            cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{swap_usage}' + down)
 
-    swapCached = terminal('cat /proc/meminfo | grep SwapCached | awk \'{ printf "%2.f", $2 / 1024 }\'').strip() + ' MB'
-    output.append(indent + colorUnicode + '    cached: ' + white + swapCached + down)
-    cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{swap_cached}' + down)
+        if show['swap-cached']:
+            swapCached = terminal('cat /proc/meminfo | grep SwapCached | awk \'{ printf "%2.f", $2 / 1024 }\'').strip() + ' MB'
+            output.append(indent + colorUnicode + '    cached: ' + white + swapCached + down)
+            cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{swap_cached}' + down)
 
-    try:
-        totalStorage = terminal('lsblk | grep / -w | awk \'{ print $4}\'')
-        output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
-        cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
-    except: pass
+    if show['storage']:
+        try:
+            totalStorage = terminal('lsblk | grep / -w | awk \'{ print $4}\'')
+            output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
+            cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
+        except: pass
 
-    try:
-        usedStorage = terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | awk \'{ print $1 }\'')
-        output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
-        cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
-    except: pass
+        if show['storage-usage']:
+            try:
+                usedStorage = terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | awk \'{ print $1 }\'')
+                output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
+                cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
+            except: pass
 
-    gpu = terminal("lspci | grep VGA | awk -F 'controller:' '{ print $2 }'").strip()
-    if not 'not found' in gpu and not 'pcilib' in gpu:
-        output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
-        cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
+    if show['gpu']:
+        gpu = terminal("lspci | grep VGA | awk -F 'controller:' '{ print $2 }'").strip()
+        if not 'not found' in gpu and not 'pcilib' in gpu:
+            output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
+            cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
 
-    processes = str(len(terminal('ps axu').split('\n')) - 1)
-    output.append(indent + colorUnicode + 'processes: ' + white + processes + down)
-    cache.append(indent + '{color_unicode}' + 'processes: ' + white + '{processes}' + down)
+    if show['processes']:
+        processes = str(len(terminal('ps axu').split('\n')) - 1)
+        output.append(indent + colorUnicode + 'processes: ' + white + processes + down)
+        cache.append(indent + '{color_unicode}' + 'processes: ' + white + '{processes}' + down)
 
-    ipv4 = terminal('hostname -I')
-    if not 'invalid' in ipv4:
-        output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
-        cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
+    if show['ipv4']:
+        ipv4 = terminal('hostname -I')
+        if not 'invalid' in ipv4:
+            output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
+            cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
 
     try:
         now = time.time()
@@ -243,31 +264,41 @@ def makeNew():
     except:
         pass
     else:
-        output.append(indent + colorUnicode + 'network speed: ' + white + down)
-        cache.append(indent + colorUnicode + 'network speed: ' + white + down)
-        output.append(
-            indent + colorUnicode + '    upload: ' + white + str(round((sentNow-sent) / (now - before) / 1024, 2)) +
-            ' kBps' + down)
-        cache.append(
-            indent + colorUnicode + '    upload: ' + white + '{upload}' + ' kBps' + down)
-        output.append(
-            indent + colorUnicode + '    download: ' + white + str(round((recvNow - recv) / (now - before) / 1024, 2))
-            + ' kBps' + down)
-        cache.append(
-            indent + colorUnicode + '    download: ' + white + '{download}' + ' kBps' + down)
+        if show['network-speed']:
+            output.append(indent + colorUnicode + 'network speed: ' + white + down)
+            cache.append(indent + colorUnicode + 'network speed: ' + white + down)
 
-        output.append(indent + colorUnicode + 'disk speed: ' + white + down)
-        cache.append(indent + colorUnicode + 'disk speed: ' + white + down)
-        output.append(
-            indent + colorUnicode + '    writing: ' + white + str(round((writtenNow - written) /
-            (now - before) / 1024, 2)) + ' kBps' + down)
-        cache.append(
-            indent + colorUnicode + '    writing: ' + white + '{writing}' + ' kBps' + down)
-        output.append(
-            indent + colorUnicode + '    reading: ' + white + str(round((redNow - red) / (now - before) / 1024, 2)) +
-            ' kBps' + down)
-        cache.append(
-            indent + colorUnicode + '    reading: ' + white + '{reading}' + ' kBps' + down)
+            if show['upload-speed']:
+                output.append(
+                    indent + colorUnicode + '    upload: ' + white + str(round((sentNow-sent) / (now - before) / 1024, 2)) +
+                    ' kBps' + down)
+                cache.append(
+                    indent + colorUnicode + '    upload: ' + white + '{upload}' + ' kBps' + down)
+
+            if show['download-speed']:
+                output.append(
+                    indent + colorUnicode + '    download: ' + white + str(round((recvNow - recv) / (now - before) / 1024, 2))
+                    + ' kBps' + down)
+                cache.append(
+                    indent + colorUnicode + '    download: ' + white + '{download}' + ' kBps' + down)
+
+        if show['disk-speed']:
+            output.append(indent + colorUnicode + 'disk speed: ' + white + down)
+            cache.append(indent + colorUnicode + 'disk speed: ' + white + down)
+
+            if show['writing-speed']:
+                output.append(
+                    indent + colorUnicode + '    writing: ' + white + str(round((writtenNow - written) /
+                    (now - before) / 1024, 2)) + ' kBps' + down)
+                cache.append(
+                    indent + colorUnicode + '    writing: ' + white + '{writing}' + ' kBps' + down)
+
+            if show['reading-speed']:
+                output.append(
+                    indent + colorUnicode + '    reading: ' + white + str(round((redNow - red) / (now - before) / 1024, 2)) +
+                    ' kBps' + down)
+                cache.append(
+                    indent + colorUnicode + '    reading: ' + white + '{reading}' + ' kBps' + down)
 
     output.append('{end}' + '\n')
     cache.append('{end}' + '\n')
@@ -321,49 +352,63 @@ def printCached(color):
         content = content.replace('{hostname}', terminal('uname -n'))
         content = content.replace('{color_unicode}', colorUnicode)
         content = content.replace('{color_unicode_bold}', colorUnicodeBold)
-        content = content.replace('{kernel}', terminal('uname -r'))
-        content = content.replace('{shell}', terminal('$SHELL --version').split('\n')[0])
 
-        try:
-            content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
-        except: pass
+        if show['kernel']:
+            content = content.replace('{kernel}', terminal('uname -r'))
 
-        try:
-            content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) +
-                                      ' C')
-        except: pass
+        if show['shell']:
+            content = content.replace('{shell}', terminal('$SHELL --version').split('\n')[0])
 
-        try:
-            content = content.replace('{ram_usage}', terminal('echo $(cat /proc/meminfo | grep MemTotal |'
-                                      ' awk \'{ print $2 }\' && cat /proc/meminfo | grep MemAvailable | '
-                                      'awk \'{ print $2 }\') | awk \'{ printf \"%d%s (%.2f GB)\", ($1 - $2) * 100 '
-                                      '/ $1, "%", ($1 -$2) / 1024 / 1024 }\''))
-        except: pass
+        if show['cpu'] and show['cpu-usage']:
+            try:
+                content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
+            except: pass
 
-        try:
-            content = content.replace('{ram_cached}', terminal(
-                'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip())
-        except: pass
+        if show['cpu'] and show['cpu-temperature']:
+            try:
+                content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) +
+                                          ' C')
+            except: pass
 
-        try:
-            content = content.replace('{swap_usage}', terminal('echo $(cat /proc/meminfo | grep SwapTotal | '
-                                      'awk \'{ print $2 }\' && cat /proc/meminfo | grep SwapFree | awk \'{ print $2 }\')'
-                                      ' | awk \'{ printf "%d%s (%.2f GB)", $1 ? ($1 - $2) * 100 / $1 : 0, "%", ($1 -$2) '
-                                      '/ 1024 / 1024 }\''))
-        except: pass
+        if show['ram'] and show['ram-usage']:
+            try:
+                content = content.replace('{ram_usage}', terminal('echo $(cat /proc/meminfo | grep MemTotal |'
+                                          ' awk \'{ print $2 }\' && cat /proc/meminfo | grep MemAvailable | '
+                                          'awk \'{ print $2 }\') | awk \'{ printf \"%d%s (%.2f GB)\", ($1 - $2) * 100 '
+                                          '/ $1, "%", ($1 -$2) / 1024 / 1024 }\''))
+            except: pass
 
-        try:
-            content = content.replace('{swap_cached}', terminal(
-               'cat /proc/meminfo | grep SwapCached | awk \'{ printf "%.2f", $2 / 1024 }\'').strip() + ' MB')
-        except: pass
+        if show['ram'] and show['ram-cached']:
+            try:
+                content = content.replace('{ram_cached}', terminal(
+                    'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip())
+            except: pass
 
-        try:
-            content = content.replace('{used_storage}', terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | '
-                                                                 'awk \'{ print $1 }\''))
-        except: pass
+        if show['swap'] and show['swap-usage']:
+            try:
+                content = content.replace('{swap_usage}', terminal('echo $(cat /proc/meminfo | grep SwapTotal | '
+                                          'awk \'{ print $2 }\' && cat /proc/meminfo | grep SwapFree | awk \'{ print $2 }\')'
+                                          ' | awk \'{ printf "%d%s (%.2f GB)", $1 ? ($1 - $2) * 100 / $1 : 0, "%", ($1 -$2) '
+                                          '/ 1024 / 1024 }\''))
+            except: pass
 
-        content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
-        content = content.replace('{ipv4}', terminal('hostname -I'))
+        if show['swap'] and show['swap-cached']:
+            try:
+                content = content.replace('{swap_cached}', terminal(
+                   'cat /proc/meminfo | grep SwapCached | awk \'{ printf "%.2f", $2 / 1024 }\'').strip() + ' MB')
+            except: pass
+
+        if show['storage'] and show['storage-usage']:
+            try:
+                content = content.replace('{used_storage}', terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | '
+                                                                     'awk \'{ print $1 }\''))
+            except: pass
+
+        if show['processes']:
+            content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
+
+        if show['ipv4']:
+            content = content.replace('{ipv4}', terminal('hostname -I'))
 
         try:
             now = time.time()
@@ -376,10 +421,17 @@ def printCached(color):
             pass
 
         else:
-            content = content.replace('{upload}', str(round((sentNow - sent) / (now - before) / 1024, 2)))
-            content = content.replace('{download}', str(round((recvNow - recv) / (now - before) / 1024, 2)))
-            content = content.replace('{writing}', str(round((writtenNow - written) / (now - before) / 1024, 2)))
-            content = content.replace('{reading}', str(round((redNow - red) / (now - before) / 1024, 2)))
+            if show['network-speed'] and show['upload-speed']:
+                content = content.replace('{upload}', str(round((sentNow - sent) / (now - before) / 1024, 2)))
+
+            if show['network-speed'] and show['upload-speed']:
+                content = content.replace('{download}', str(round((recvNow - recv) / (now - before) / 1024, 2)))
+
+            if show['disk-speed'] and show['writing-speed']:
+                content = content.replace('{writing}', str(round((writtenNow - written) / (now - before) / 1024, 2)))
+
+            if show['disk-speed'] and show['reading-speed']:
+                content = content.replace('{reading}', str(round((redNow - red) / (now - before) / 1024, 2)))
 
         print('')
         sys.stdout.write(content)
