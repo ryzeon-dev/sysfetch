@@ -7,14 +7,17 @@ Features hardware and operative system centered information.
 Inspired by Neofetch and PowerLevel10k
 
 ## Install 
-To install sysfetch in your system, you need to execute "install.sh" file with root privilegies:
+To install sysfetch in your system, you need to execute "install.sh" file:
 
 ```commandline
 $ ./install.sh
 ```
 
+At a certain point you will be prompted for your password, in order to give root privilegies to the script,
+please DO NOT execute it as root beforehand.\
 The script will create a folder called "sysfetch" in "/usr/share", and will copy "distros.py" into it. \
-The "sysfetch" main script will be copied into "/usr/local/bin".
+The "sysfetch" main script will be copied into "/usr/local/bin".\
+A new fodler will be created in your home directory, in which there will be stored the configuration file and the cache file.
 
 It is also required to have installed the package "psutil", 
 which can be installed both by your distro's package manager or

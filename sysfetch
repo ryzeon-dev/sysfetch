@@ -92,11 +92,8 @@ def makeNew():
 
     else:
         unicodeLogo = '\uF31A'
-        if osname in unicodes.keys():
-
-            for key in unicodes:
-                if key.lower() in osname.lower():
-                    unicodeLogo = unicodes[key]
+        if osname.lower() in unicodes.keys():
+            unicodeLogo = unicodes[osname.lower()]
 
         else:
             try:
@@ -164,7 +161,8 @@ def makeNew():
     output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
     cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
 
-    cpuThreads = terminal('echo $(lscpu | grep Thread | awk -F \':\' \'{ print $2 }\' && lscpu  | grep "CPU(s)" -m 1 | awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')
+    cpuThreads = terminal('echo $(lscpu | grep Thread | awk -F \':\' \'{ print $2 }\' && lscpu  | grep "CPU(s)" -m 1 |'
+                          ' awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')
     output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
     cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
 
@@ -182,39 +180,31 @@ def makeNew():
     except:
         pass
 
-    ram = str(round(
-        float(terminal('cat /proc/meminfo | grep MemTotal | awk \'{ print $2 / 1024 / 1024 }\'').replace(',', '.')),
-        2)) + ' GB'
+    ram = terminal('cat /proc/meminfo | grep MemTotal | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'')+ ' GB'
     output.append(indent + colorUnicode + 'ram: ' + white + ram + down)
     cache.append(indent + '{color_unicode}' + 'ram: ' + white + ram + down)
 
-    ramUsage = str(round(float(terminal(
-        "echo $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' && cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }') | awk '{ print ($1 - $2) * 100 / $1 }'").replace(
-        ',', '.')))) + '% (' + str(round(float(terminal(
-        "echo $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' && cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }') | awk '{ print ($1 - $2) / 1024 / 1024 }'").replace(
-        ',', '.')), 2)) + ' GB)'
+    ramUsage = terminal('echo $(cat /proc/meminfo | grep MemTotal | awk \'{ print $2 }\' && cat /proc/meminfo |'
+                        ' grep MemAvailable | awk \'{ print $2 }\') | awk \'{ printf \"%d %s (%.2f GB)\", ($1 - $2) *'
+                        ' 100 / $1, "%", ($1 -$2) / 1024 / 1024 }\'')
     output.append(indent + colorUnicode + '    usage: ' + white + ramUsage + down)
     cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{ram_usage}' + down)
 
-    ramCached = terminal('cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ print $2 / 1024 " MB"}\'').strip()
+    ramCached = terminal('cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip()
     output.append(indent + colorUnicode + '    cached: ' + white + ramCached + down)
     cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{ram_cached}' + down)
 
-    swap = str(round(
-        float(terminal('cat /proc/meminfo | grep "SwapTotal" | awk \'{ print $2 / 1024 / 1024 }\'').replace(',', '.')),
-        2)) + ' GB'
+    swap = terminal('cat /proc/meminfo | grep "SwapTotal" | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'') + ' GB'
     output.append(indent + colorUnicode + 'swap: ' + white + swap + down)
     cache.append(indent + '{color_unicode}' + 'swap: ' + white + swap + down)
 
-    swapUsage = str(round(float(terminal(
-        "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print $1 ? ($1 - $2) * 100 / $1 : 0}'").replace(
-        ',', '.')))) + '% (' + str(round(float(terminal(
-        "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print ($1 - $2) / 1024 / 1024 }'").replace(
-        ',', '.')), 2)) + ' GB)'
+    swapUsage = terminal('echo $(cat /proc/meminfo | grep SwapTotal | awk \'{ print $2 }\' && cat /proc/meminfo | '
+                         'grep SwapFree | awk \'{ print $2 }\') | awk \'{ printf "%d%s (%.2f GB)", $1 ? ($1 - $2) * 100'
+                         ' / $1 : 0, "%", ($1 -$2) / 1024 / 1024 }\'')
     output.append(indent + colorUnicode + '    usage: ' + white + swapUsage + down)
     cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{swap_usage}' + down)
 
-    swapCached = terminal('cat /proc/meminfo | grep SwapCached | awk \'{ print $2 / 1024 }\'').strip() + ' MB'
+    swapCached = terminal('cat /proc/meminfo | grep SwapCached | awk \'{ printf "%2.f", $2 / 1024 }\'').strip() + ' MB'
     output.append(indent + colorUnicode + '    cached: ' + white + swapCached + down)
     cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{swap_cached}' + down)
 
@@ -256,22 +246,26 @@ def makeNew():
         output.append(indent + colorUnicode + 'network speed: ' + white + down)
         cache.append(indent + colorUnicode + 'network speed: ' + white + down)
         output.append(
-            indent + colorUnicode + '    upload: ' + white + str(round((sentNow-sent) / (now - before) / 1024, 2)) + ' kBps' + down)
+            indent + colorUnicode + '    upload: ' + white + str(round((sentNow-sent) / (now - before) / 1024, 2)) +
+            ' kBps' + down)
         cache.append(
             indent + colorUnicode + '    upload: ' + white + '{upload}' + ' kBps' + down)
         output.append(
-            indent + colorUnicode + '    download: ' + white + str(round((recvNow - recv) / (now - before) / 1024, 2)) + ' kBps' + down)
+            indent + colorUnicode + '    download: ' + white + str(round((recvNow - recv) / (now - before) / 1024, 2))
+            + ' kBps' + down)
         cache.append(
             indent + colorUnicode + '    download: ' + white + '{download}' + ' kBps' + down)
 
         output.append(indent + colorUnicode + 'disk speed: ' + white + down)
         cache.append(indent + colorUnicode + 'disk speed: ' + white + down)
         output.append(
-            indent + colorUnicode + '    writing: ' + white + str(round((writtenNow - written) / (now - before) / 1024, 2)) + ' kBps' + down)
+            indent + colorUnicode + '    writing: ' + white + str(round((writtenNow - written) /
+            (now - before) / 1024, 2)) + ' kBps' + down)
         cache.append(
             indent + colorUnicode + '    writing: ' + white + '{writing}' + ' kBps' + down)
         output.append(
-            indent + colorUnicode + '    reading: ' + white + str(round((redNow - red) / (now - before) / 1024, 2)) + ' kBps' + down)
+            indent + colorUnicode + '    reading: ' + white + str(round((redNow - red) / (now - before) / 1024, 2)) +
+            ' kBps' + down)
         cache.append(
             indent + colorUnicode + '    reading: ' + white + '{reading}' + ' kBps' + down)
 
@@ -335,37 +329,37 @@ def printCached(color):
         except: pass
 
         try:
-            content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) + ' C')
+            content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) +
+                                      ' C')
         except: pass
 
         try:
-            content = content.replace('{ram_usage}', str(round(float(terminal(
-            "echo $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' && cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }') | awk '{ print ($1 - $2) * 100 / $1 }'").replace(
-            ',', '.')))) + '% (' + str(round(float(terminal(
-            "echo $(cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' && cat /proc/meminfo | grep MemAvailable | awk '{ print $2 }') | awk '{ print ($1 - $2) / 1024 / 1024 }'").replace(
-            ',', '.')), 2)) + ' GB)')
+            content = content.replace('{ram_usage}', terminal('echo $(cat /proc/meminfo | grep MemTotal |'
+                                      ' awk \'{ print $2 }\' && cat /proc/meminfo | grep MemAvailable | '
+                                      'awk \'{ print $2 }\') | awk \'{ printf \"%d%s (%.2f GB)\", ($1 - $2) * 100 '
+                                      '/ $1, "%", ($1 -$2) / 1024 / 1024 }\''))
         except: pass
 
         try:
             content = content.replace('{ram_cached}', terminal(
-                'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ print $2 / 1024 " MB"}\'').strip())
+                'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip())
         except: pass
 
         try:
-            content = content.replace('{swap_usage}', str(round(float(terminal(
-                "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print $1 ? ($1 - $2) * 100 / $1 : 0}'").replace(
-                ',', '.')))) + '% (' + str(round(float(terminal(
-                "echo $(cat /proc/meminfo | grep SwapTotal | awk '{ print $2 }' && cat /proc/meminfo | grep SwapFree | awk '{ print $2 }') | awk '{ print ($1 - $2) / 1024 / 1024 }'").replace(
-                ',', '.')), 2)) + ' GB)')
+            content = content.replace('{swap_usage}', terminal('echo $(cat /proc/meminfo | grep SwapTotal | '
+                                      'awk \'{ print $2 }\' && cat /proc/meminfo | grep SwapFree | awk \'{ print $2 }\')'
+                                      ' | awk \'{ printf "%d%s (%.2f GB)", $1 ? ($1 - $2) * 100 / $1 : 0, "%", ($1 -$2) '
+                                      '/ 1024 / 1024 }\''))
         except: pass
 
         try:
             content = content.replace('{swap_cached}', terminal(
-               'cat /proc/meminfo | grep SwapCached | awk \'{ print $2 / 1024 }\'').strip() + ' MB')
+               'cat /proc/meminfo | grep SwapCached | awk \'{ printf "%.2f", $2 / 1024 }\'').strip() + ' MB')
         except: pass
 
         try:
-            content = content.replace('{used_storage}', terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | awk \'{ print $1 }\''))
+            content = content.replace('{used_storage}', terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | '
+                                                                 'awk \'{ print $1 }\''))
         except: pass
 
         content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
