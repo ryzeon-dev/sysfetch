@@ -368,7 +368,7 @@ def printCached(color):
                 content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
             except: pass
 
-        if show['cpu'] and show['cpu-temperature']:
+        if show['cpu'] and show['cpu-temp']:
             try:
                 content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) +
                                           ' C')
