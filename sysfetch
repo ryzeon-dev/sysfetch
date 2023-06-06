@@ -162,7 +162,7 @@ def makeNew():
         output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
         cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
 
-        if show['cpu-architecture']:
+        if show['cpu-arch']:
             cpuarch = terminal('lscpu | grep Arch | awk -F \':\' \'{ print $2 }\'').strip()
             output.append(indent + colorUnicode + '    architecture: ' + white + cpuarch + down)
             cache.append(indent + '{color_unicode}' + '    architecture: ' + white + cpuarch + down)
