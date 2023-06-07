@@ -135,7 +135,7 @@ def makeNew():
         unicodeLogo + ' {hostname} ' + white + '{color_unicode}' + '' + white + down)
 
     if show['os']:
-        if asciiArt == 'Android':
+        if asciiArt == 'android':
             distro = 'Android'
 
         else:
