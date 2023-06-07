@@ -49,7 +49,8 @@ unicodes = {
     'mandriva': '\uF311',
     'mageia': '\uF310',
     'devuan': '\uF307',
-    'tux' : '\uF31A'
+    'tux' : '\uF31A',
+    'android' : '\uF17B'
 }
 
 colors = {
