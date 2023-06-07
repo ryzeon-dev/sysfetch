@@ -232,15 +232,17 @@ def makeNew():
     if show['storage']:
         try:
             totalStorage = terminal('lsblk | grep / -w | awk \'{ print $4}\'')
-            output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
-            cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
+            if not 'not found' in totalStorage:
+                output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
+                cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
         except: pass
 
         if show['storage-usage']:
             try:
                 usedStorage = terminal('lsblk -f -o FSUSE%,MOUNTPOINT | grep / -w | awk \'{ print $1 }\'')
-                output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
-                cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
+                if not 'not found' in usedStorage:
+                    output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
+                    cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
             except: pass
 
     if show['gpu']:
