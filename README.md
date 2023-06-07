@@ -13,11 +13,11 @@ To install sysfetch in your system, you need to execute "install.sh" file:
 $ ./install.sh
 ```
 
-At a certain point you will be prompted for your password, in order to give root privilegies to the script,
+At a certain point you will be prompted for your password, in order to give root privileges to the script,
 please DO NOT execute it as root beforehand.\
 The script will create a folder called "sysfetch" in "/usr/share", and will copy "distros.py" into it. \
 The "sysfetch" main script will be copied into "/usr/local/bin".\
-A new fodler will be created in your home directory, in which there will be stored the configuration file and the cache file.
+A new folder will be created in your home directory, in which there will be stored the configuration file and the cache file.
 
 It is also required to have installed the package "psutil", 
 which can be installed both by your distro's package manager or
@@ -61,6 +61,12 @@ Available colors:
 - orange
 - aquagreen
 
+In case you want to see only the information (and not the distro's ascii art), give "no-ascii-art" as parameter, together with "recache":
+```commandline
+$ sysfetch no-ascii-art recache
+```
+If you run these parameters, the "no-ascii-art" behaviour will be cached. To revert it (and get back your ascii art), simply recache.
+
 To get help about usage, it is available the "--help" option:
 
 ```commandline
@@ -68,15 +74,16 @@ $ sysfetch --help
 ```
 
 
-If you wish to set a personalised default behaviour, you can edit the configurartion file
-located in "$HOME/.sysfetch/conf.json". Example configuration:
+If you wish to set a personalised default behaviour, you can edit the configuration file
+located in "$HOME/.sysfetch/conf.json". Default configuration:
 
 ```json
 {
-  "ascii-art" : "debian",
-  "separator-unicode" : "debian",
-  "default-color" : "aquagreen",
+  "ascii-art" : "",
+  "separator-unicode" : "",
+  "default-color" : "",
   "always-recache" : false,
+  "no-ascii-art" :  false,
   "show" : {
     "os" : true,
     "kernel" : true,
@@ -117,7 +124,12 @@ Available always-recache values:
 - true
 - false
 
+Available no-ascii-art values:
+- true
+- false
+
 Available separator unicode:
+- `empty`
 - alpine
 - macos
 - arch
@@ -138,6 +150,7 @@ Available separator unicode:
 - tux
 
 Available colors:
+- `empty`
 - grey
 - red
 - yellow
@@ -149,6 +162,7 @@ Available colors:
 - aquagreen
 
 Available ascii-art:
+- `empty`
  - armbian
  - aix
  - alpine

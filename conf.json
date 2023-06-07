@@ -3,6 +3,7 @@
   "separator-unicode" : "",
   "default-color" : "",
   "always-recache" : false,
+  "no-ascii-art" : false,
   "show" : {
     "os" : true,
     "kernel" : true,

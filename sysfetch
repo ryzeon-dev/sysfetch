@@ -124,8 +124,12 @@ def makeNew():
 
     colorUnicode = f'\x1b[1;{color}'
     colorUnicodeBold = f'\x1b[7;{color}'
+
     white = '\x1b[00m'
     indent = f'\x1b[{width}C'
+
+    if 'no-ascii-art' in sys.argv or conf['no-ascii-art']:
+        indent = ''
     down = '\n'
 
     output.append('{up}' + indent + '\x1b[1D' + colorUnicode + '' + white + f'{colorUnicodeBold} ' + terminal(
@@ -318,18 +322,26 @@ def makeNew():
     else:
         end = f'\x1b[9999D\x1b[{height - lines}B'
 
+    if 'no-ascii-art' in sys.argv or conf['no-ascii-art']:
+        up = ''
+        end = ''
+
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
 
-    output.insert(0, colorUnicode + asciiLogo + white)
-    cache.insert(0, colorUnicode + asciiLogo + white)
+    if 'no-ascii-art' not in sys.argv and not conf['no-ascii-art']:
+        output.insert(0, colorUnicode + asciiLogo + white)
+        cache.insert(0, colorUnicode + asciiLogo + white)
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
 
-    print('')
+    if 'no-ascii-art' not in sys.argv and not conf['no-ascii-art']:
+        print('')
+
     sys.stdout.write(''.join(output))
-    print('')
+    if 'no-ascii-art' not in sys.argv and not conf['no-ascii-art']:
+        print('')
 
     with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
         file.write(''.join(cache))
@@ -469,7 +481,8 @@ Command line system information tool written in Python
 
 Options:
     recache             makes new cache file updating all static data 
-    color               allows to set the color of teh text output 
+    color               allows to set the color of teh text output
+    no-ascii-art        output information only, no distro ascii art 
     --help, -h          show this message and exit
 
 Colors:
@@ -481,8 +494,22 @@ For an example configutation, check at https://github.com/cpy-dev/sysfetch
             sys.exit(0)
         
         if 'color' in sys.argv:
-            colorIndex = sys.argv.index('color') + 1
-            color = colors[sys.argv[colorIndex]]
+            try:
+                colorIndex = sys.argv.index('color') + 1
+
+            except:
+                print('Error: A color must be given after "color" paramter')
+                sys.exit(0)
+
+            else:
+                choosenColor = sys.argv[colorIndex]
+                if choosenColor in colors.keys():
+                    color = colors[sys.argv[colorIndex]]
+
+                else:
+                    print(f'Error: "{choosenColor}" is not in the color list')
+                    sys.exit(0)
+
 
         if 'recache' in sys.argv or conf['always-recache']:
             makeNew()
