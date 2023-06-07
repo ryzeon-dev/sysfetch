@@ -73,7 +73,7 @@ def makeNew():
 
     if 'Android' in terminal('uname -a'):
         asciiArt = 'android'
-        osname = None
+        osname = 'android'
 
     else:
         osname = terminal('cat /etc/os-release | grep -w ID | awk -F \'=\' \'{ print $2 }\'').strip().lower()
