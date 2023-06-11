@@ -238,7 +238,7 @@ def makeNew():
 
     if show['storage']:
         try:
-            totalStorage = terminal('f -h / | grep / | awk \'{ print $2 }\'')
+            totalStorage = terminal('df -h / | grep / | awk \'{ print $2 }\'')
             if not 'not found' in totalStorage:
                 output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
                 cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
@@ -246,7 +246,7 @@ def makeNew():
 
         if show['storage-usage']:
             try:
-                usedStorage = terminal('f -h / | grep / | awk \'{ print $5 }\'')
+                usedStorage = terminal('df -h / | grep / | awk \'{ print $5 }\'')
                 if not 'not found' in usedStorage:
                     output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
                     cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
@@ -422,7 +422,7 @@ def printCached(color):
 
         if show['storage'] and show['storage-usage']:
             try:
-                content = content.replace('{used_storage}', terminal('f -h / | grep / | awk \'{ print $5 }\''))
+                content = content.replace('{used_storage}', terminal('df -h / | grep / | awk \'{ print $5 }\''))
             except: pass
 
         if show['processes']:
