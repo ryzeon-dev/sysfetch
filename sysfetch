@@ -159,29 +159,31 @@ def makeNew():
 
     if show['shell']:
         shell = terminal('$SHELL --version').split('\n')[0]
-        output.append(indent + colorUnicode + 'shell: ' + white + shell + down)
-        cache.append(indent + '{color_unicode}' + 'shell: ' + white + '{shell}' + down)
+        if 'not found' not in shell:
+            output.append(indent + colorUnicode + 'shell: ' + white + shell + down)
+            cache.append(indent + '{color_unicode}' + 'shell: ' + white + '{shell}' + down)
 
     if show['cpu']:
-        cpu = terminal('lscpu | grep "Model name" | awk -F \':\' \'{ print $2 }\'').strip().split('\n')[0]
+        cpu = terminal('cat /proc/cpuinfo | grep -m 1 "model name" | awk -F \':\' \'{ print $2 }\'').strip()  
         output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
         cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
 
         if show['cpu-arch']:
-            cpuarch = terminal('lscpu | grep Arch | awk -F \':\' \'{ print $2 }\'').strip()
+            cpuarch = terminal('arch').strip()
             output.append(indent + colorUnicode + '    architecture: ' + white + cpuarch + down)
             cache.append(indent + '{color_unicode}' + '    architecture: ' + white + cpuarch + down)
 
         if show['cpu-cores']:
-            cpuCores = terminal('lscpu | grep "CPU(s)" -m 1 | awk -F \':\' \'{ print $2 }\'').strip()
+            cpuCores = terminal('cat /proc/cpuinfo | grep -c processor').strip()        
             output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
             cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
 
         if show['cpu-threads']:
-            cpuThreads = terminal('echo $(lscpu | grep Thread | awk -F \':\' \'{ print $2 }\' && lscpu  | grep "CPU(s)" -m 1 |'
-                                  ' awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')
-            output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
-            cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
+            cpuThreads = terminal('echo $( cat /proc/cpuinfo | grep -c processor && '
+                'lscpu | grep Thread | awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')       
+            if 'not found' not in cpuThreads:   
+                output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
+                cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
 
         if show['cpu-usage']:
             try:
@@ -261,7 +263,7 @@ def makeNew():
         cache.append(indent + '{color_unicode}' + 'processes: ' + white + '{processes}' + down)
 
     if show['ipv4']:
-        ipv4 = terminal('hostname -I')
+        ipv4 = terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\' | awk -F \'/\' \'{ print $1 }\') | awk -F \'127.0.0.1 \' \'{ print $2 }\'')
         if not 'invalid' in ipv4:
             output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
             cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
