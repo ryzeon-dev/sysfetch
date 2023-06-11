@@ -1,6 +1,12 @@
-sudo mkdir /usr/share/sysfetch &>> /dev/null
-sudo cp sysfetch /usr/local/bin &>> /dev/null
-sudo cp distros.py /usr/share/sysfetch &>> /dev/null
+if ! [ "not found" in  "$(which sudo)" ]; then
+	sudo mkdir /usr/share/sysfetch &>> /dev/null
+	sudo cp sysfetch /usr/local/bin &>> /dev/null
+	sudo cp distros.py /usr/share/sysfetch &>> /dev/null
+else:
+	mkdir /usr/share/sysfetch &>> /dev/null
+	cp sysfetch /usr/local/bin &>> /dev/null
+	cp distros.py /usr/share/sysfetch &>> /dev/null
+fi
 
 mkdir $HOME/.sysfetch &>> /dev/null
 cp conf.json $HOME/.sysfetch &>> /dev/null
