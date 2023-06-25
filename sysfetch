@@ -366,7 +366,7 @@ def makeNew(ignoreConf=False):
         file.write(''.join(cache))
 
 
-def printCached(color, ignoreConf=False):
+def printCached(color):
     with open(HOME + '/.sysfetch/sysfetch.cache', 'r') as cache:
 
         try:
@@ -380,7 +380,7 @@ def printCached(color, ignoreConf=False):
 
         content = cache.read()
 
-        if not ignoreConf and conf['default-color']:
+        if conf['default-color']:
             color = colors[conf['default-color']]
 
         colorUnicode = f'\x1b[1;{color}'
@@ -540,8 +540,8 @@ For an example configutation, check at https://github.com/cpy-dev/sysfetch
                     sys.exit(0)
 
 
-        if 'recache' in sys.argv or (not ignoreConf and conf['always-recache']):
+        if 'recache' in sys.argv or 'no-ascii-art' in sys.argv or ignoreConf or conf['always-recache']:
             makeNew(ignoreConf)
             
         else:
-            printCached(color, ignoreConf)
+            printCached(color)
