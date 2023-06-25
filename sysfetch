@@ -23,12 +23,15 @@ except:
 else:
     import distros
 
-try:
-    conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
-    show = conf['show']
-except:
-    print('Can\'t read conf.json, please execute "install.sh" script to install or update the software')
-    sys.exit(0)
+def getConf():
+    try:
+        conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
+        show = conf['show']
+    except:
+        print('Can\'t read conf.json, please execute "install.sh" script to install or update the software')
+        sys.exit(0)
+    else:
+        return conf, show
 
 unicodes = {
     'alpine': '\uF300',
@@ -65,7 +68,7 @@ colors = {
     'aquagreen': '96m'
 }
 
-def makeNew():
+def makeNew(ignoreConf=False):
     output = []
     cache = []
 
@@ -86,14 +89,14 @@ def makeNew():
             if osname in distros.distro.keys():
                 asciiArt = osname
 
-    if conf['ascii-art']:
+    if not ignoreConf and conf['ascii-art']:
         asciiArt = conf['ascii-art']
 
     asciiLogo = distros.distro[asciiArt][0]
     width = distros.distro[asciiArt][1]
     height = distros.distro[asciiArt][2]
 
-    if conf['separator-unicode']:
+    if not ignoreConf and conf['separator-unicode']:
         unicodeLogo = unicodes[conf['separator-unicode']]
 
     else:
@@ -128,8 +131,9 @@ def makeNew():
     white = '\x1b[00m'
     indent = f'\x1b[{width}C'
 
-    if 'no-ascii-art' in sys.argv or conf['no-ascii-art']:
+    if 'no-ascii-art' in sys.argv or (not ignoreConf and conf['no-ascii-art']):
         indent = ''
+
     down = '\n'
 
     output.append('{up}' + indent + '\x1b[1D' + colorUnicode + '' + white + f'{colorUnicodeBold} ' + terminal(
@@ -138,7 +142,7 @@ def makeNew():
         '{up}' + indent + '\x1b[1D' + '{color_unicode}' + '' + white + '{color_unicode_bold} ' + '{username} ' +
         unicodeLogo + ' {hostname} ' + white + '{color_unicode}' + '' + white + down)
 
-    if show['os']:
+    if ignoreConf or show['os']:
         if asciiArt == 'android':
             distro = 'Android'
 
@@ -153,40 +157,40 @@ def makeNew():
         output.append(indent + colorUnicode + 'os: ' + white + distro + down)
         cache.append(indent + '{color_unicode}' + 'os: ' + white + distro + down)
 
-    if show['kernel']:
+    if ignoreConf or show['kernel']:
         kernel = terminal('uname -r')
         output.append(indent + colorUnicode + 'kernel: ' + white + kernel + down)
         cache.append(indent + '{color_unicode}' + 'kernel: ' + white + '{kernel}' + down)
 
-    if show['shell']:
+    if ignoreConf or show['shell']:
         shell = terminal('$SHELL --version').split('\n')[0]
         if 'not found' not in shell:
             output.append(indent + colorUnicode + 'shell: ' + white + shell + down)
             cache.append(indent + '{color_unicode}' + 'shell: ' + white + '{shell}' + down)
 
-    if show['cpu']:
+    if ignoreConf or show['cpu']:
         cpu = terminal('cat /proc/cpuinfo | grep -m 1 "model name" | awk -F \':\' \'{ print $2 }\'').strip()  
         output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
         cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
 
-        if show['cpu-arch']:
+        if ignoreConf or show['cpu-arch']:
             cpuarch = terminal('arch').strip()
             output.append(indent + colorUnicode + '    architecture: ' + white + cpuarch + down)
             cache.append(indent + '{color_unicode}' + '    architecture: ' + white + cpuarch + down)
 
-        if show['cpu-cores']:
+        if ignoreConf or show['cpu-cores']:
             cpuCores = terminal('cat /proc/cpuinfo | grep -c processor').strip()        
             output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
             cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
 
-        if show['cpu-threads']:
+        if ignoreConf or show['cpu-threads']:
             cpuThreads = terminal('echo $( cat /proc/cpuinfo | grep -c processor && '
                 'lscpu | grep Thread | awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')       
             if 'not found' not in cpuThreads:   
                 output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
                 cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
 
-        if show['cpu-usage']:
+        if ignoreConf or show['cpu-usage']:
             try:
                 cpuUsage = str(psutil.cpu_percent()) + '%'
                 output.append(indent + colorUnicode + '    usage: ' + white + cpuUsage + down)
@@ -194,7 +198,7 @@ def makeNew():
             except:
                 pass
 
-        if show['cpu-temp']:
+        if ignoreConf or show['cpu-temp']:
             try:
                 cpuTemp = str(psutil.sensors_temperatures()['coretemp'][0].current) + ' C'
                 output.append(indent + colorUnicode + '    temperature: ' + white + cpuTemp + down)
@@ -202,46 +206,46 @@ def makeNew():
             except:
                 pass
 
-    if show['load']:
+    if ignoreConf or show['load']:
         load = terminal('uptime | awk -F \'load average: \' \'{ print $2 }\' | awk -F \', \' \'{ print $1 }\'').strip()
         output.append(indent + colorUnicode + 'system load: ' + white + load + down)
         cache.append(indent + '{color_unicode}' + 'system load: ' + white + '{load}' + down)
 
-    if show['ram']:
+    if ignoreConf or show['ram']:
         ram = terminal('cat /proc/meminfo | grep MemTotal | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'')+ ' GB'
         output.append(indent + colorUnicode + 'ram: ' + white + ram + down)
         cache.append(indent + '{color_unicode}' + 'ram: ' + white + ram + down)
 
-        if show['ram-usage']:
+        if ignoreConf or show['ram-usage']:
             ramUsage = terminal('echo $(cat /proc/meminfo | grep MemTotal | awk \'{ print $2 }\' && cat /proc/meminfo |'
                                 ' grep MemAvailable | awk \'{ print $2 }\') | awk \'{ printf \"%d %s (%.2f GB)\", ($1 - $2) *'
                                 ' 100 / $1, "%", ($1 -$2) / 1024 / 1024 }\'')
             output.append(indent + colorUnicode + '    usage: ' + white + ramUsage + down)
             cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{ram_usage}' + down)
 
-        if show['ram-cached']:
+        if ignoreConf or show['ram-cached']:
             ramCached = terminal('cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip()
             output.append(indent + colorUnicode + '    cached: ' + white + ramCached + down)
             cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{ram_cached}' + down)
 
-    if show['swap']:
+    if ignoreConf or show['swap']:
         swap = terminal('cat /proc/meminfo | grep "SwapTotal" | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'') + ' GB'
         output.append(indent + colorUnicode + 'swap: ' + white + swap + down)
         cache.append(indent + '{color_unicode}' + 'swap: ' + white + swap + down)
 
-        if show['swap-usage']:
+        if ignoreConf or show['swap-usage']:
             swapUsage = terminal('echo $(cat /proc/meminfo | grep SwapTotal | awk \'{ print $2 }\' && cat /proc/meminfo | '
                                  'grep SwapFree | awk \'{ print $2 }\') | awk \'{ printf "%d%s (%.2f GB)", $1 ? ($1 - $2) * 100'
                                  ' / $1 : 0, "%", ($1 -$2) / 1024 / 1024 }\'')
             output.append(indent + colorUnicode + '    usage: ' + white + swapUsage + down)
             cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{swap_usage}' + down)
 
-        if show['swap-cached']:
+        if ignoreConf or show['swap-cached']:
             swapCached = terminal('cat /proc/meminfo | grep SwapCached | awk \'{ printf "%2.f", $2 / 1024 }\'').strip() + ' MB'
             output.append(indent + colorUnicode + '    cached: ' + white + swapCached + down)
             cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{swap_cached}' + down)
 
-    if show['storage']:
+    if ignoreConf or show['storage']:
         try:
             totalStorage = terminal('df -h / | grep / -w | awk \'{ print $2 }\'')
             if not 'not found' in totalStorage:
@@ -249,7 +253,7 @@ def makeNew():
                 cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
         except: pass
 
-        if show['storage-usage']:
+        if ignoreConf or show['storage-usage']:
             try:
                 usedStorage = terminal('df -h / | grep / -w | awk \'{ print $5 }\'')
                 if not 'not found' in usedStorage:
@@ -257,19 +261,20 @@ def makeNew():
                     cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
             except: pass
 
-    if show['gpu']:
+    if ignoreConf or show['gpu']:
         gpu = terminal("lspci | grep VGA | awk -F 'controller:' '{ print $2 }'").strip()
         if not 'not found' in gpu and not 'pcilib' in gpu:
             output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
             cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
 
-    if show['processes']:
+    if ignoreConf or show['processes']:
         processes = str(len(terminal('ps axu').split('\n')) - 1)
         output.append(indent + colorUnicode + 'processes: ' + white + processes + down)
         cache.append(indent + '{color_unicode}' + 'processes: ' + white + '{processes}' + down)
 
-    if show['ipv4']:
-        ipv4 = terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\' | awk -F \'/\' \'{ print $1 }\') | awk -F \'127.0.0.1 \' \'{ print $2 }\'')
+    if ignoreConf or show['ipv4']:
+        ipv4 = terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\' | awk -F \'/\' \'{ print $1 }\') | '
+                        'awk -F \'127.0.0.1 \' \'{ print $2 }\'')
         if not 'invalid' in ipv4:
             output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
             cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
@@ -283,36 +288,36 @@ def makeNew():
     except:
         pass
     else:
-        if show['network-speed']:
+        if ignoreConf or show['network-speed']:
             output.append(indent + colorUnicode + 'network speed: ' + white + down)
             cache.append(indent + colorUnicode + 'network speed: ' + white + down)
 
-            if show['upload-speed']:
+            if ignoreConf or show['upload-speed']:
                 output.append(
                     indent + colorUnicode + '    upload: ' + white + str(round((sentNow-sent) / (now - before) / 1024, 2)) +
                     ' kBps' + down)
                 cache.append(
                     indent + colorUnicode + '    upload: ' + white + '{upload}' + ' kBps' + down)
 
-            if show['download-speed']:
+            if ignoreConf or show['download-speed']:
                 output.append(
                     indent + colorUnicode + '    download: ' + white + str(round((recvNow - recv) / (now - before) / 1024, 2))
                     + ' kBps' + down)
                 cache.append(
                     indent + colorUnicode + '    download: ' + white + '{download}' + ' kBps' + down)
 
-        if show['disk-speed']:
+        if ignoreConf or show['disk-speed']:
             output.append(indent + colorUnicode + 'disk speed: ' + white + down)
             cache.append(indent + colorUnicode + 'disk speed: ' + white + down)
 
-            if show['writing-speed']:
+            if ignoreConf or show['writing-speed']:
                 output.append(
                     indent + colorUnicode + '    writing: ' + white + str(round((writtenNow - written) /
                     (now - before) / 1024, 2)) + ' kBps' + down)
                 cache.append(
                     indent + colorUnicode + '    writing: ' + white + '{writing}' + ' kBps' + down)
 
-            if show['reading-speed']:
+            if ignoreConf or show['reading-speed']:
                 output.append(
                     indent + colorUnicode + '    reading: ' + white + str(round((redNow - red) / (now - before) / 1024, 2)) +
                     ' kBps' + down)
@@ -330,32 +335,32 @@ def makeNew():
     else:
         end = f'\x1b[9999D\x1b[{height - lines}B'
 
-    if 'no-ascii-art' in sys.argv or conf['no-ascii-art']:
+    if 'no-ascii-art' in sys.argv or (not ignoreConf and conf['no-ascii-art']):
         up = ''
         end = ''
 
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
 
-    if 'no-ascii-art' not in sys.argv and not conf['no-ascii-art']:
+    if 'no-ascii-art' not in sys.argv or not (not ignoreConf and conf['no-ascii-art']):
         output.insert(0, colorUnicode + asciiLogo + white)
         cache.insert(0, colorUnicode + asciiLogo + white)
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
 
-    if 'no-ascii-art' not in sys.argv and not conf['no-ascii-art']:
+    if 'no-ascii-art' not in sys.argv or not (not ignoreConf and conf['no-ascii-art']):
         print('')
 
     sys.stdout.write(''.join(output))
-    if 'no-ascii-art' not in sys.argv and not conf['no-ascii-art']:
+    if 'no-ascii-art' not in sys.argv or not (not ignoreConf and conf['no-ascii-art']):
         print('')
 
     with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
         file.write(''.join(cache))
 
 
-def printCached(color):
+def printCached(color, ignoreConf=False):
     with open(HOME + '/.sysfetch/sysfetch.cache', 'r') as cache:
 
         try:
@@ -369,7 +374,7 @@ def printCached(color):
 
         content = cache.read()
 
-        if conf['default-color']:
+        if not ignoreConf and conf['default-color']:
             color = colors[conf['default-color']]
 
         colorUnicode = f'\x1b[1;{color}'
@@ -380,29 +385,29 @@ def printCached(color):
         content = content.replace('{color_unicode}', colorUnicode)
         content = content.replace('{color_unicode_bold}', colorUnicodeBold)
 
-        if show['kernel']:
+        if ignoreConf or show['kernel']:
             content = content.replace('{kernel}', terminal('uname -r'))
 
-        if show['shell']:
+        if ignoreConf or  show['shell']:
             content = content.replace('{shell}', terminal('$SHELL --version').split('\n')[0])
 
-        if show['cpu'] and show['cpu-usage']:
+        if ignoreConf or ( show['cpu'] and show['cpu-usage']):
             try:
                 content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
             except: pass
 
-        if show['cpu'] and show['cpu-temp']:
+        if ignoreConf or (show['cpu'] and show['cpu-temp']):
             try:
                 content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) +
                                           ' C')
             except: pass
 
-        if show['load']:
+        if ignoreConf or show['load']:
             try: content = content.replace('{load}', terminal('uptime | awk -F \'load average: \' \'{ print $2 }\' | '
                                                               'awk -F \', \' \'{ print $1 }\'').strip())
             except: pass
 
-        if show['ram'] and show['ram-usage']:
+        if ignoreConf or (show['ram'] and show['ram-usage']):
             try:
                 content = content.replace('{ram_usage}', terminal('echo $(cat /proc/meminfo | grep MemTotal |'
                                           ' awk \'{ print $2 }\' && cat /proc/meminfo | grep MemAvailable | '
@@ -410,13 +415,13 @@ def printCached(color):
                                           '/ $1, "%", ($1 -$2) / 1024 / 1024 }\''))
             except: pass
 
-        if show['ram'] and show['ram-cached']:
+        if ignoreConf or (show['ram'] and show['ram-cached']):
             try:
                 content = content.replace('{ram_cached}', terminal(
                     'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip())
             except: pass
 
-        if show['swap'] and show['swap-usage']:
+        if ignoreConf or (show['swap'] and show['swap-usage']):
             try:
                 content = content.replace('{swap_usage}', terminal('echo $(cat /proc/meminfo | grep SwapTotal | '
                                           'awk \'{ print $2 }\' && cat /proc/meminfo | grep SwapFree | awk \'{ print $2 }\')'
@@ -424,21 +429,21 @@ def printCached(color):
                                           '/ 1024 / 1024 }\''))
             except: pass
 
-        if show['swap'] and show['swap-cached']:
+        if ignoreConf or (show['swap'] and show['swap-cached']):
             try:
                 content = content.replace('{swap_cached}', terminal(
                    'cat /proc/meminfo | grep SwapCached | awk \'{ printf "%.2f", $2 / 1024 }\'').strip() + ' MB')
             except: pass
 
-        if show['storage'] and show['storage-usage']:
+        if ignoreConf or (show['storage'] and show['storage-usage']):
             try:
                 content = content.replace('{used_storage}', terminal('df -h / | grep / -w | awk \'{ print $5 }\''))
             except: pass
 
-        if show['processes']:
+        if ignoreConf or show['processes']:
             content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
 
-        if show['ipv4']:
+        if ignoreConf or show['ipv4']:
             content = content.replace('{ipv4}', terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\' | awk -F \'/\' \'{ print $1 }\') | awk -F \'127.0.0.1 \' \'{ print $2 }\''))
 
         try:
@@ -452,16 +457,16 @@ def printCached(color):
             pass
 
         else:
-            if show['network-speed'] and show['upload-speed']:
+            if ignoreConf or (show['network-speed'] and show['upload-speed']):
                 content = content.replace('{upload}', str(round((sentNow - sent) / (now - before) / 1024, 2)))
 
-            if show['network-speed'] and show['upload-speed']:
+            if ignoreConf or (show['network-speed'] and show['upload-speed']):
                 content = content.replace('{download}', str(round((recvNow - recv) / (now - before) / 1024, 2)))
 
-            if show['disk-speed'] and show['writing-speed']:
+            if ignoreConf or (show['disk-speed'] and show['writing-speed']):
                 content = content.replace('{writing}', str(round((writtenNow - written) / (now - before) / 1024, 2)))
 
-            if show['disk-speed'] and show['reading-speed']:
+            if ignoreConf or (show['disk-speed'] and show['reading-speed']):
                 content = content.replace('{reading}', str(round((redNow - red) / (now - before) / 1024, 2)))
 
         print('')
@@ -472,18 +477,23 @@ def printCached(color):
 if __name__ == '__main__':
     color = colors['aquagreen']
 
-    if conf['default-color']:
-        color = colors[conf['default-color']]
+    if not 'ignore-conf' in sys.argv:
+        ignoreConf = False
+        conf, show = getConf()
+        if conf['default-color']:
+            color = colors[conf['default-color']]
+    else:
+        ignoreConf = True
 
     if not '.sysfetch' in os.listdir(HOME):
         terminal(f'mkdir  {HOME}/.sysfetch')
 
     if len(sys.argv) == 1:
-        if 'sysfetch.cache' in os.listdir(HOME + '/.sysfetch') and not conf['always-recache']:
-            printCached(color)
+        if 'sysfetch.cache' in os.listdir(HOME + '/.sysfetch') and (ignoreConf or not conf['always-recache']):
+            printCached(color, ignoreConf)
 
         else:
-            makeNew()
+            makeNew(ignoreConf)
 
     else:
         if '--help' in sys.argv or '-h' in sys.argv:
@@ -494,7 +504,8 @@ Command line system information tool written in Python
 Options:
     recache             makes new cache file updating all static data 
     color               allows to set the color of teh text output
-    no-ascii-art        output information only, no distro ascii art 
+    no-ascii-art        output information only, no distro ascii art (requires recache)
+    ignore-conf         ignores conf.json file and follows standard behaviour (requires recache)
     --help, -h          show this message and exit
 
 Colors:
@@ -523,8 +534,8 @@ For an example configutation, check at https://github.com/cpy-dev/sysfetch
                     sys.exit(0)
 
 
-        if 'recache' in sys.argv or conf['always-recache']:
-            makeNew()
+        if 'recache' in sys.argv or (not ignoreConf and conf['always-recache']):
+            makeNew(ignoreConf)
             
         else:
-            printCached(color)
+            printCached(color, ignoreConf)
