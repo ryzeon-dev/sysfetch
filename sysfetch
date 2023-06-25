@@ -335,25 +335,31 @@ def makeNew(ignoreConf=False):
     else:
         end = f'\x1b[9999D\x1b[{height - lines}B'
 
-    if 'no-ascii-art' in sys.argv or (not ignoreConf and conf['no-ascii-art']):
+    showAsciiArt = 'no-ascii-art' not in sys.argv and (ignoreConf or (not ignoreConf and not conf['no-ascii-art']))
+
+    if not showAsciiArt:
         up = ''
         end = ''
+
 
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
 
-    if 'no-ascii-art' not in sys.argv or not (not ignoreConf and conf['no-ascii-art']):
+
+    if showAsciiArt:
         output.insert(0, colorUnicode + asciiLogo + white)
         cache.insert(0, colorUnicode + asciiLogo + white)
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
 
-    if 'no-ascii-art' not in sys.argv or not (not ignoreConf and conf['no-ascii-art']):
+
+    if showAsciiArt:
         print('')
 
     sys.stdout.write(''.join(output))
-    if 'no-ascii-art' not in sys.argv or not (not ignoreConf and conf['no-ascii-art']):
+
+    if showAsciiArt:
         print('')
 
     with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
@@ -385,29 +391,29 @@ def printCached(color, ignoreConf=False):
         content = content.replace('{color_unicode}', colorUnicode)
         content = content.replace('{color_unicode_bold}', colorUnicodeBold)
 
-        if ignoreConf or show['kernel']:
+        if show['kernel']:
             content = content.replace('{kernel}', terminal('uname -r'))
 
         if ignoreConf or  show['shell']:
             content = content.replace('{shell}', terminal('$SHELL --version').split('\n')[0])
 
-        if ignoreConf or ( show['cpu'] and show['cpu-usage']):
+        if  show['cpu'] and show['cpu-usage']:
             try:
                 content = content.replace('{cpu_usage}', str(psutil.cpu_percent()) + '%')
             except: pass
 
-        if ignoreConf or (show['cpu'] and show['cpu-temp']):
+        if show['cpu'] and show['cpu-temp']:
             try:
                 content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) +
                                           ' C')
             except: pass
 
-        if ignoreConf or show['load']:
+        if show['load']:
             try: content = content.replace('{load}', terminal('uptime | awk -F \'load average: \' \'{ print $2 }\' | '
                                                               'awk -F \', \' \'{ print $1 }\'').strip())
             except: pass
 
-        if ignoreConf or (show['ram'] and show['ram-usage']):
+        if show['ram'] and show['ram-usage']:
             try:
                 content = content.replace('{ram_usage}', terminal('echo $(cat /proc/meminfo | grep MemTotal |'
                                           ' awk \'{ print $2 }\' && cat /proc/meminfo | grep MemAvailable | '
@@ -415,13 +421,13 @@ def printCached(color, ignoreConf=False):
                                           '/ $1, "%", ($1 -$2) / 1024 / 1024 }\''))
             except: pass
 
-        if ignoreConf or (show['ram'] and show['ram-cached']):
+        if show['ram'] and show['ram-cached']:
             try:
                 content = content.replace('{ram_cached}', terminal(
                     'cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip())
             except: pass
 
-        if ignoreConf or (show['swap'] and show['swap-usage']):
+        if show['swap'] and show['swap-usage']:
             try:
                 content = content.replace('{swap_usage}', terminal('echo $(cat /proc/meminfo | grep SwapTotal | '
                                           'awk \'{ print $2 }\' && cat /proc/meminfo | grep SwapFree | awk \'{ print $2 }\')'
@@ -429,21 +435,21 @@ def printCached(color, ignoreConf=False):
                                           '/ 1024 / 1024 }\''))
             except: pass
 
-        if ignoreConf or (show['swap'] and show['swap-cached']):
+        if show['swap'] and show['swap-cached']:
             try:
                 content = content.replace('{swap_cached}', terminal(
                    'cat /proc/meminfo | grep SwapCached | awk \'{ printf "%.2f", $2 / 1024 }\'').strip() + ' MB')
             except: pass
 
-        if ignoreConf or (show['storage'] and show['storage-usage']):
+        if show['storage'] and show['storage-usage']:
             try:
                 content = content.replace('{used_storage}', terminal('df -h / | grep / -w | awk \'{ print $5 }\''))
             except: pass
 
-        if ignoreConf or show['processes']:
+        if show['processes']:
             content = content.replace('{processes}', str(len(terminal('ps axu').split('\n')) - 1))
 
-        if ignoreConf or show['ipv4']:
+        if show['ipv4']:
             content = content.replace('{ipv4}', terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\' | awk -F \'/\' \'{ print $1 }\') | awk -F \'127.0.0.1 \' \'{ print $2 }\''))
 
         try:
@@ -457,16 +463,16 @@ def printCached(color, ignoreConf=False):
             pass
 
         else:
-            if ignoreConf or (show['network-speed'] and show['upload-speed']):
+            if show['network-speed'] and show['upload-speed']:
                 content = content.replace('{upload}', str(round((sentNow - sent) / (now - before) / 1024, 2)))
 
-            if ignoreConf or (show['network-speed'] and show['upload-speed']):
+            if show['network-speed'] and show['upload-speed']:
                 content = content.replace('{download}', str(round((recvNow - recv) / (now - before) / 1024, 2)))
 
-            if ignoreConf or (show['disk-speed'] and show['writing-speed']):
+            if show['disk-speed'] and show['writing-speed']:
                 content = content.replace('{writing}', str(round((writtenNow - written) / (now - before) / 1024, 2)))
 
-            if ignoreConf or (show['disk-speed'] and show['reading-speed']):
+            if show['disk-speed'] and show['reading-speed']:
                 content = content.replace('{reading}', str(round((redNow - red) / (now - before) / 1024, 2)))
 
         print('')
