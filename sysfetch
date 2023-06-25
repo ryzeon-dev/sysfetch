@@ -200,7 +200,9 @@ def makeNew(ignoreConf=False):
 
         if ignoreConf or show['cpu-temp']:
             try:
-                cpuTemp = str(psutil.sensors_temperatures()['coretemp'][0].current) + ' C'
+                temps = psutil.sensors_temperatures()
+                keys = list(temps.keys())
+                cpuTemp = str(temps[keys[0]][0].current) + ' C'
                 output.append(indent + colorUnicode + '    temperature: ' + white + cpuTemp + down)
                 cache.append(indent + '{color_unicode}' + '    temperature: ' + white + '{cpu_temperature}' + down)
             except:
@@ -404,8 +406,10 @@ def printCached(color):
 
         if show['cpu'] and show['cpu-temp']:
             try:
-                content = content.replace('{cpu_temperature}', str(psutil.sensors_temperatures()['coretemp'][0].current) +
-                                          ' C')
+                temps = psutil.sensors_temperatures()
+                keys = list(temps.keys())
+                cpuTemp = str(temps[keys[0]][0].current) + ' C'
+                content = content.replace('{cpu_temperature}', cpuTemp)
             except: pass
 
         if show['load']:
@@ -496,7 +500,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 1:
         if 'sysfetch.cache' in os.listdir(HOME + '/.sysfetch') and (ignoreConf or not conf['always-recache']):
-            printCached(color, ignoreConf)
+            printCached(color)
 
         else:
             makeNew(ignoreConf)
