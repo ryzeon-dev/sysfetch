@@ -128,19 +128,24 @@ def makeNew(ignoreConf=False):
     colorUnicode = f'\x1b[1;{color}'
     colorUnicodeBold = f'\x1b[7;{color}'
 
-    white = '\x1b[00m'
+    white = '\x1b[0m'
     indent = f'\x1b[{width}C'
 
-    if 'no-ascii-art' in sys.argv or (not ignoreConf and conf['no-ascii-art']):
+    if not ('no-ascii-art' not in sys.argv and (ignoreConf or (not ignoreConf and not conf['no-ascii-art']))):
         indent = ''
+        height = 0
 
-    down = '\n'
+    down = '\x1b[1B\x1b[9999D'
+    downCount = 0
 
     output.append('{up}' + indent + '\x1b[1D' + colorUnicode + '' + white + f'{colorUnicodeBold} ' + terminal(
         'whoami') + f' {unicodeLogo} ' + terminal('uname -n') + ' ' + white + colorUnicode + '' + white + down)
     cache.append(
         '{up}' + indent + '\x1b[1D' + '{color_unicode}' + '' + white + '{color_unicode_bold} ' + '{username} ' +
         unicodeLogo + ' {hostname} ' + white + '{color_unicode}' + '' + white + down)
+
+    downCount += 1
+    down = '\n' if downCount >= height else down
 
     if ignoreConf or show['os']:
         if asciiArt == 'android':
@@ -157,31 +162,44 @@ def makeNew(ignoreConf=False):
         output.append(indent + colorUnicode + 'os: ' + white + distro + down)
         cache.append(indent + '{color_unicode}' + 'os: ' + white + distro + down)
 
+        downCount += 1
+        down = '\n' if downCount >= height else down
+
     if ignoreConf or show['kernel']:
         kernel = terminal('uname -r')
         output.append(indent + colorUnicode + 'kernel: ' + white + kernel + down)
         cache.append(indent + '{color_unicode}' + 'kernel: ' + white + '{kernel}' + down)
+        downCount += 1
+        down = '\n' if downCount >= height else down
 
     if ignoreConf or show['shell']:
         shell = terminal('$SHELL --version').split('\n')[0]
         if 'not found' not in shell:
             output.append(indent + colorUnicode + 'shell: ' + white + shell + down)
             cache.append(indent + '{color_unicode}' + 'shell: ' + white + '{shell}' + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
     if ignoreConf or show['cpu']:
         cpu = terminal('cat /proc/cpuinfo | grep -m 1 "model name" | awk -F \':\' \'{ print $2 }\'').strip()  
         output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
         cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
+        downCount += 1
+        down = '\n' if downCount >= height else down
 
         if ignoreConf or show['cpu-arch']:
             cpuarch = terminal('arch').strip()
             output.append(indent + colorUnicode + '    architecture: ' + white + cpuarch + down)
             cache.append(indent + '{color_unicode}' + '    architecture: ' + white + cpuarch + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
         if ignoreConf or show['cpu-cores']:
             cpuCores = terminal('cat /proc/cpuinfo | grep -c processor').strip()        
             output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
             cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
         if ignoreConf or show['cpu-threads']:
             cpuThreads = terminal('echo $( cat /proc/cpuinfo | grep -c processor && '
@@ -189,12 +207,17 @@ def makeNew(ignoreConf=False):
             if 'not found' not in cpuThreads:   
                 output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
                 cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
 
         if ignoreConf or show['cpu-usage']:
             try:
                 cpuUsage = str(psutil.cpu_percent()) + '%'
                 output.append(indent + colorUnicode + '    usage: ' + white + cpuUsage + down)
                 cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{cpu_usage}' + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
+
             except:
                 pass
 
@@ -205,6 +228,9 @@ def makeNew(ignoreConf=False):
                 cpuTemp = str(temps[keys[0]][0].current) + ' C'
                 output.append(indent + colorUnicode + '    temperature: ' + white + cpuTemp + down)
                 cache.append(indent + '{color_unicode}' + '    temperature: ' + white + '{cpu_temperature}' + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
+
             except:
                 pass
 
@@ -212,11 +238,15 @@ def makeNew(ignoreConf=False):
         load = terminal('uptime | awk -F \'load average: \' \'{ print $2 }\' | awk -F \', \' \'{ print $1 }\'').strip()
         output.append(indent + colorUnicode + 'system load: ' + white + load + down)
         cache.append(indent + '{color_unicode}' + 'system load: ' + white + '{load}' + down)
+        downCount += 1
+        down = '\n' if downCount >= height else down
 
     if ignoreConf or show['ram']:
         ram = terminal('cat /proc/meminfo | grep MemTotal | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'')+ ' GB'
         output.append(indent + colorUnicode + 'ram: ' + white + ram + down)
         cache.append(indent + '{color_unicode}' + 'ram: ' + white + ram + down)
+        downCount += 1
+        down = '\n' if downCount >= height else down
 
         if ignoreConf or show['ram-usage']:
             ramUsage = terminal('echo $(cat /proc/meminfo | grep MemTotal | awk \'{ print $2 }\' && cat /proc/meminfo |'
@@ -224,16 +254,22 @@ def makeNew(ignoreConf=False):
                                 ' 100 / $1, "%", ($1 -$2) / 1024 / 1024 }\'')
             output.append(indent + colorUnicode + '    usage: ' + white + ramUsage + down)
             cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{ram_usage}' + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
         if ignoreConf or show['ram-cached']:
             ramCached = terminal('cat /proc/meminfo | grep -m 1 "Cached" | awk  \'{ printf "%.2f MB", $2 / 1024}\'').strip()
             output.append(indent + colorUnicode + '    cached: ' + white + ramCached + down)
             cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{ram_cached}' + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
     if ignoreConf or show['swap']:
         swap = terminal('cat /proc/meminfo | grep "SwapTotal" | awk \'{ printf "%.2f", $2 / 1024 / 1024 }\'') + ' GB'
         output.append(indent + colorUnicode + 'swap: ' + white + swap + down)
         cache.append(indent + '{color_unicode}' + 'swap: ' + white + swap + down)
+        downCount += 1
+        down = '\n' if downCount >= height else down
 
         if ignoreConf or show['swap-usage']:
             swapUsage = terminal('echo $(cat /proc/meminfo | grep SwapTotal | awk \'{ print $2 }\' && cat /proc/meminfo | '
@@ -241,11 +277,15 @@ def makeNew(ignoreConf=False):
                                  ' / $1 : 0, "%", ($1 -$2) / 1024 / 1024 }\'')
             output.append(indent + colorUnicode + '    usage: ' + white + swapUsage + down)
             cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{swap_usage}' + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
         if ignoreConf or show['swap-cached']:
             swapCached = terminal('cat /proc/meminfo | grep SwapCached | awk \'{ printf "%2.f", $2 / 1024 }\'').strip() + ' MB'
             output.append(indent + colorUnicode + '    cached: ' + white + swapCached + down)
             cache.append(indent + '{color_unicode}' + '    cached: ' + white + '{swap_cached}' + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
     if ignoreConf or show['storage']:
         try:
@@ -253,6 +293,9 @@ def makeNew(ignoreConf=False):
             if not 'not found' in totalStorage:
                 output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
                 cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
+
         except: pass
 
         if ignoreConf or show['storage-usage']:
@@ -261,6 +304,9 @@ def makeNew(ignoreConf=False):
                 if not 'not found' in usedStorage:
                     output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
                     cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
+                    downCount += 1
+                    down = '\n' if downCount >= height else down
+
             except: pass
 
     if ignoreConf or show['gpu']:
@@ -268,11 +314,15 @@ def makeNew(ignoreConf=False):
         if not 'not found' in gpu and not 'pcilib' in gpu:
             output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
             cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
     if ignoreConf or show['processes']:
         processes = str(len(terminal('ps axu').split('\n')) - 1)
         output.append(indent + colorUnicode + 'processes: ' + white + processes + down)
         cache.append(indent + '{color_unicode}' + 'processes: ' + white + '{processes}' + down)
+        downCount += 1
+        down = '\n' if downCount >= height else down
 
     if ignoreConf or show['ipv4']:
         ipv4 = terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\' | awk -F \'/\' \'{ print $1 }\') | '
@@ -280,6 +330,8 @@ def makeNew(ignoreConf=False):
         if not 'invalid' in ipv4:
             output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
             cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
     try:
         now = time.time()
@@ -293,6 +345,8 @@ def makeNew(ignoreConf=False):
         if ignoreConf or show['network-speed']:
             output.append(indent + colorUnicode + 'network speed: ' + white + down)
             cache.append(indent + colorUnicode + 'network speed: ' + white + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
             if ignoreConf or show['upload-speed']:
                 output.append(
@@ -300,6 +354,8 @@ def makeNew(ignoreConf=False):
                     ' kBps' + down)
                 cache.append(
                     indent + colorUnicode + '    upload: ' + white + '{upload}' + ' kBps' + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
 
             if ignoreConf or show['download-speed']:
                 output.append(
@@ -307,10 +363,14 @@ def makeNew(ignoreConf=False):
                     + ' kBps' + down)
                 cache.append(
                     indent + colorUnicode + '    download: ' + white + '{download}' + ' kBps' + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
 
         if ignoreConf or show['disk-speed']:
             output.append(indent + colorUnicode + 'disk speed: ' + white + down)
             cache.append(indent + colorUnicode + 'disk speed: ' + white + down)
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
             if ignoreConf or show['writing-speed']:
                 output.append(
@@ -318,6 +378,8 @@ def makeNew(ignoreConf=False):
                     (now - before) / 1024, 2)) + ' kBps' + down)
                 cache.append(
                     indent + colorUnicode + '    writing: ' + white + '{writing}' + ' kBps' + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
 
             if ignoreConf or show['reading-speed']:
                 output.append(
@@ -325,9 +387,11 @@ def makeNew(ignoreConf=False):
                     ' kBps' + down)
                 cache.append(
                     indent + colorUnicode + '    reading: ' + white + '{reading}' + ' kBps' + down)
+                downCount += 1
+                down = '\n' if downCount >= height else down
 
-    output.append('{end}' + '\n')
-    cache.append('{end}' + '\n')
+    output.append('{end}')
+    cache.append('{end}')
 
     lines = len(output)
 
@@ -343,26 +407,23 @@ def makeNew(ignoreConf=False):
         up = ''
         end = ''
 
-
     output[0] = output[0].replace('{up}', up)
     cache[0] = cache[0].replace('{up}', up)
 
-
     if showAsciiArt:
-        output.insert(0, colorUnicode + asciiLogo + white)
-        cache.insert(0, colorUnicode + asciiLogo + white)
+        output.insert(0, colorUnicode + asciiLogo.replace('\x1b[?7l', '') + white)
+        cache.insert(0, colorUnicode + asciiLogo.replace('\x1b[?7l', '') + white)
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
 
-
     if showAsciiArt:
         print('')
 
-    sys.stdout.write(''.join(output))
+    print(''.join(output))
 
-    if showAsciiArt:
-        print('')
+    #if showAsciiArt:
+    #    print('')
 
     with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
         file.write(''.join(cache))
