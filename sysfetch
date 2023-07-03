@@ -411,8 +411,8 @@ def makeNew(ignoreConf=False):
     cache[0] = cache[0].replace('{up}', up)
 
     if showAsciiArt:
-        output.insert(0, colorUnicode + asciiLogo.replace('\x1b[?7l', '') + white)
-        cache.insert(0, colorUnicode + asciiLogo.replace('\x1b[?7l', '') + white)
+        output.insert(0, colorUnicode + asciiLogo.replace('\x1b[?7l', '').replace('\x1b[?25l', '') + white)
+        cache.insert(0, colorUnicode + asciiLogo.replace('\x1b[?7l', '').replace('\x1b[?25l', '') + white)
 
     output[-1] = output[-1].replace('{end}', end)
     cache[-1] = cache[-1].replace('{end}', end)
