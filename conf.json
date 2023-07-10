@@ -24,6 +24,7 @@
     "storage" : true,
     "storage-usage" : true,
     "gpu" : true,
+    "gpu-usage" : true,
     "processes" : true,
     "ipv4" : true,
     "network-speed" : true,

@@ -318,13 +318,14 @@ def makeNew(ignoreConf=False):
             downCount += 1
             down = '\n' if downCount >= height else down
 
-        try:
-            usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'')
-            output.append(indent + colorUnicode +  '    usage: ' + white + usage + down)
-            cache.append(indent + colorUnicode +  '    usage: ' + white + '{gpu_usage}' + down)
-
-        except: pass
-        
+        if ignoreConf or show['gpu-usage']:
+            if 'intel' in gpu.lower():
+                try:
+                    usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'')
+                    if not 'not-found' in usage:
+                        output.append(indent + colorUnicode +  '    usage: ' + white + usage + down)
+                        cache.append(indent + colorUnicode +  '    usage: ' + white + '{gpu_usage}' + down)
+                except: pass    
         
     if ignoreConf or show['processes']:
         processes = str(len(terminal('ps axu').split('\n')) - 1)
@@ -487,6 +488,12 @@ def printCached(color):
                                                               'awk -F \', \' \'{ print $1 }\'').strip())
             except: pass
 
+        if show['gpu'] and show['gpu-usage']:
+            try:
+                usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'')
+                content = content.replace('{gpu_usage}', usage)                
+            except: pass
+
         if show['ram'] and show['ram-usage']:
             try:
                 content = content.replace('{ram_usage}', terminal('echo $(cat /proc/meminfo | grep MemTotal |'
@@ -590,7 +597,7 @@ Options:
 
 Colors:
     red, yellow, grey, purple, green, lightblue, blue, orange, aquagreen (default)
-    
+   
 To set a standard behaviuor, edit the file "conf.json" located in $HOME/.sysfetch/conf.json
 For an example configutation, check at https://github.com/cpy-dev/sysfetch
             ''')
