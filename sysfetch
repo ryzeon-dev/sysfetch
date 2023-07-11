@@ -321,8 +321,8 @@ def makeNew(ignoreConf=False):
         if ignoreConf or show['gpu-usage']:
             if 'intel' in gpu.lower():
                 try:
-                    usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'')
-                    if not 'not-found' in usage:
+                    usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'') + '%'
+                    if 'not-found' not in usage and 'failed' not in usage:
                         output.append(indent + colorUnicode +  '    usage: ' + white + usage + down)
                         cache.append(indent + colorUnicode +  '    usage: ' + white + '{gpu_usage}' + down)
                 except: pass    
@@ -490,7 +490,7 @@ def printCached(color):
 
         if show['gpu'] and show['gpu-usage']:
             try:
-                usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'')
+                usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'') + '%'
                 content = content.replace('{gpu_usage}', usage)                
             except: pass
 
