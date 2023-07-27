@@ -181,7 +181,9 @@ def makeNew(ignoreConf=False):
             down = '\n' if downCount >= height else down
 
     if ignoreConf or show['cpu']:
-        cpu = terminal('cat /proc/cpuinfo | grep -m 1 "model name" | awk -F \':\' \'{ print $2 }\'').strip()  
+        cpu = terminal('cat /proc/cpuinfo | grep -m 1 "model name" | awk -F \':\' \'{ print $2 }\'').strip()
+        if not cpu:
+            cpu = terminal('lscpu | grep "Model name" -w | awk -F \':\' \'{ print $2 }\'').strip()
         output.append(indent + colorUnicode + 'cpu: ' + white + cpu + down)
         cache.append(indent + '{color_unicode}' + 'cpu: ' + white + cpu + down)
         downCount += 1
@@ -195,15 +197,15 @@ def makeNew(ignoreConf=False):
             down = '\n' if downCount >= height else down
 
         if ignoreConf or show['cpu-cores']:
-            cpuCores = terminal('cat /proc/cpuinfo | grep -c processor').strip()        
+            cpuCores = terminal('cat /proc/cpuinfo | grep -m 1 cores | awk -F \':\' \'{ print $2 }\'').strip()
+
             output.append(indent + colorUnicode + '    cores: ' + white + cpuCores + down)
             cache.append(indent + '{color_unicode}' + '    cores: ' + white + cpuCores + down)
             downCount += 1
             down = '\n' if downCount >= height else down
 
         if ignoreConf or show['cpu-threads']:
-            cpuThreads = terminal('echo $( cat /proc/cpuinfo | grep -c processor && '
-                'lscpu | grep Thread | awk -F \':\' \'{ print $2 }\') | awk \'{ print $1 * $2 }\'')       
+            cpuThreads = terminal('cat /proc/cpuinfo | grep -c processor').strip()
             if 'not found' not in cpuThreads:   
                 output.append(indent + colorUnicode + '    threads: ' + white + cpuThreads + down)
                 cache.append(indent + '{color_unicode}' + '    threads: ' + white + cpuThreads + down)
@@ -312,21 +314,12 @@ def makeNew(ignoreConf=False):
 
     if ignoreConf or show['gpu']:
         gpu = terminal("lspci | grep VGA | awk -F 'controller:' '{ print $2 }'").strip()
-        if not 'not found' in gpu and not 'pcilib' in gpu:
+        if not 'not found' in gpu and not 'pcilib' in gpu and gpu:
             output.append(indent + colorUnicode + 'gpu: ' + white + gpu + down)
             cache.append(indent + '{color_unicode}' + 'gpu: ' + white + gpu + down)
             downCount += 1
             down = '\n' if downCount >= height else down
 
-        if ignoreConf or show['gpu-usage']:
-            if 'intel' in gpu.lower():
-                try:
-                    usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'') + '%'
-                    if 'not-found' not in usage and 'failed' not in usage:
-                        output.append(indent + colorUnicode +  '    usage: ' + white + usage + down)
-                        cache.append(indent + colorUnicode +  '    usage: ' + white + '{gpu_usage}' + down)
-                except: pass    
-        
     if ignoreConf or show['processes']:
         processes = str(len(terminal('ps axu').split('\n')) - 1)
         output.append(indent + colorUnicode + 'processes: ' + white + processes + down)
@@ -488,12 +481,6 @@ def printCached(color):
                                                               'awk -F \', \' \'{ print $1 }\'').strip())
             except: pass
 
-        if show['gpu'] and show['gpu-usage']:
-            try:
-                usage = terminal('echo $(sudo timeout -s INT 1 intel_gpu_top -s 1000 -o - | awk \'{ print $9 }\') | awk \'{ print $3 }\'') + '%'
-                content = content.replace('{gpu_usage}', usage)                
-            except: pass
-
         if show['ram'] and show['ram-usage']:
             try:
                 content = content.replace('{ram_usage}', terminal('echo $(cat /proc/meminfo | grep MemTotal |'
@@ -590,7 +577,7 @@ Command line system information tool written in Python
 
 Options:
     recache             makes new cache file updating all static data 
-    color               allows to set the color of teh text output
+    color               allows to set the color of the text output
     no-ascii-art        output information only, no distro ascii art (requires recache)
     ignore-conf         ignores conf.json file and follows standard behaviour (requires recache)
     --help, -h          show this message and exit

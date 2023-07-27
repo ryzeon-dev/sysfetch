@@ -2,7 +2,7 @@
 Command-line system information tool written in Python.\
 Features hardware and operative system centered information.
 
-![sample.png](sample.png)
+![sample.png](screenshots/debian.png)
 
 Inspired by Neofetch and PowerLevel10k
 
@@ -10,14 +10,20 @@ Inspired by Neofetch and PowerLevel10k
 To install sysfetch in your system, you need to execute "install.sh" file:
 
 ```commandline
-$ ./install.sh
+$ ./install.sh full
+$ ./install.sh update
 ```
 
+The installation script needs a parameter, which can either be "full" or "update":
+- if you choose "full":
+  - The script will create a folder called "sysfetch" in "/usr/share", and will copy "distros.py" into it. 
+  - The "sysfetch" main script will be copied into "/usr/local/bin".
+  - A new folder named ".sysfetch" will be created in your home directory, in which there will be stored the configuration file and the cache file.
+- if you choose "update":
+  - The script will copy the latest version of "sysfetch" script into "/usr/local/bin"
+
 At a certain point you will be prompted for your password, in order to give root privileges to the script,
-please DO NOT execute it as root beforehand.\
-The script will create a folder called "sysfetch" in "/usr/share", and will copy "distros.py" into it. \
-The "sysfetch" main script will be copied into "/usr/local/bin".\
-A new folder will be created in your home directory, in which there will be stored the configuration file and the cache file.
+please DO NOT execute it as root beforehand.
 
 It is also required to have installed the package "psutil", 
 which can be installed both by your distro's package manager or
@@ -61,11 +67,18 @@ Available colors:
 - orange
 - aquagreen
 
-In case you want to see only the information (and not the distro's ascii art), give "no-ascii-art" as parameter, together with "recache":
+In case you want to see only the information (and not the distro's ascii art):
 ```commandline
-$ sysfetch no-ascii-art recache
+$ sysfetch no-ascii-art 
 ```
-If you run these parameters, the "no-ascii-art" behaviour will be cached. To revert it (and get back your ascii art), simply recache.
+If you run this, the "no-ascii-art" behaviour will be cached. To revert it (and get back your ascii art), simply recache.
+
+
+To ignore your configuration file:
+```commandline
+sysfetch ignore-conf
+```
+Similarly to "no-ascii-art", if you give the parameter "ignore-conf", its output will be cached. Use "recache" parameter to restore configuration 
 
 To get help about usage, it is available the "--help" option:
 
@@ -75,7 +88,12 @@ $ sysfetch --help
 
 
 If you wish to set a personalised default behaviour, you can edit the configuration file
-located in "$HOME/.sysfetch/conf.json". Default configuration:
+located in "$HOME/.sysfetch/conf.json". 
+
+WARNING: do NOT delete any row or parameter in the configuration file, as it will cause sysfetch to crash. 
+In case you accidentally do, simply reinstall sysfetch specifying "full". 
+
+Default configuration:
 
 ```json
 {
@@ -83,29 +101,30 @@ located in "$HOME/.sysfetch/conf.json". Default configuration:
   "separator-unicode" : "",
   "default-color" : "",
   "always-recache" : false,
-  "no-ascii-art" :  false,
+  "no-ascii-art" : false,
   "show" : {
     "os" : true,
     "kernel" : true,
     "shell" : true,
     "cpu" : true,
-    "cpu-architecture" : true,
+    "cpu-arch" : true,
     "cpu-cores" : true,
     "cpu-threads" : true,
     "cpu-usage" : true,
-    "cpu-temperature" : true,
+    "cpu-temp" : true,
+    "load" : true,
     "ram" : true,
     "ram-usage" : true,
     "ram-cached" : true,
     "swap" : true,
     "swap-usage" : true,
-    "swap-cached" : true, 
+    "swap-cached" : true,
     "storage" : true,
     "storage-usage" : true,
     "gpu" : true,
     "processes" : true,
     "ipv4" : true,
-    "network-speed" : true, 
+    "network-speed" : true,
     "upload-speed" : true,
     "download-speed" : true,
     "disk-speed" : true,
