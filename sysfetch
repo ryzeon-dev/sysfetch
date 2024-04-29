@@ -227,7 +227,16 @@ def makeNew(ignoreConf=False):
             try:
                 temps = psutil.sensors_temperatures()
                 keys = list(temps.keys())
-                cpuTemp = str(temps[keys[0]][0].current) + ' C'
+
+                key = keys[0]
+                if 'coretemp' in keys:
+                    key = 'coretemp'
+
+                elif 'k10temp' in keys:
+                    key = 'k10temp'
+
+
+                cpuTemp = str(temps[key][0].current) + ' C'
                 output.append(indent + colorUnicode + '    temperature: ' + white + cpuTemp + down)
                 cache.append(indent + '{color_unicode}' + '    temperature: ' + white + '{cpu_temperature}' + down)
                 downCount += 1
@@ -328,8 +337,8 @@ def makeNew(ignoreConf=False):
         down = '\n' if downCount >= height else down
 
     if ignoreConf or show['ipv4']:
-        ipv4 = terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\' | awk -F \'/\' \'{ print $1 }\') | '
-                        'awk -F \'127.0.0.1 \' \'{ print $2 }\'')
+        ipv4 = terminal('echo $(ip a | grep inet -w | awk \'{ print $2 }\')')
+
         if not 'invalid' in ipv4 and not 'not found' in ipv4:
             output.append(indent + colorUnicode + 'ipv4: ' + white + ipv4 + down)
             cache.append(indent + '{color_unicode}' + 'ipv4: ' + white + '{ipv4}' + down)
@@ -425,9 +434,6 @@ def makeNew(ignoreConf=False):
 
     print(''.join(output))
 
-    #if showAsciiArt:
-    #    print('')
-
     with open(HOME + '/.sysfetch/sysfetch.cache', 'w') as file:
         file.write(''.join(cache))
 
@@ -438,6 +444,7 @@ def printCached(color):
         try:
             sent = psutil.net_io_counters().bytes_sent
             recv = psutil.net_io_counters().bytes_recv
+
             written = psutil.disk_io_counters().write_bytes
             red = psutil.disk_io_counters().read_bytes
             before = time.time()
