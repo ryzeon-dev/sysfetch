@@ -7,7 +7,7 @@ Features hardware and operative system centered information.
 Inspired by Neofetch and PowerLevel10k
 
 ## Install 
-Required packages: `python3 python3-pip python3-venv python3-psutil`
+Required packages: `python3 python3-pip python3-venv`
 
 To install sysfetch in your system, you need to execute "install.sh" file:
 
