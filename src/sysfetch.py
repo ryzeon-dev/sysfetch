@@ -3,33 +3,26 @@
 import sys
 from subprocess import getoutput as terminal
 
-if not 'Android' in terminal('uname -a'):
+if not 'android' in terminal('uname -a').lower():
     import psutil
 
 import os
 import json
 import time
 
-HOME = terminal('echo $HOME')
+HOME = os.getenv('HOME')
 
-try:
-    sys.path.append('/usr/share/sysfetch')
-except:
-    conf = json.load(open('conf.json', 'r'))
-    try:
-        import distros
-    except:
-        print('Using sysfetch out of its git directory is possible only if you executed install.sh script')
-else:
-    import distros
+import distros
 
 def getConf():
     try:
         conf = json.load(open(f'{HOME}/.sysfetch/conf.json', 'r'))
         show = conf['show']
+
     except:
         print('Can\'t read conf.json, please execute "install.sh" script to install or update the software')
         sys.exit(0)
+
     else:
         return conf, show
 
@@ -74,7 +67,7 @@ def makeNew(ignoreConf=False):
 
     asciiArt = 'tux'
 
-    if 'Android' in terminal('uname -a'):
+    if 'android' in terminal('uname -a').lower():
         asciiArt = 'android'
         osname = 'android'
 
@@ -235,7 +228,6 @@ def makeNew(ignoreConf=False):
                 elif 'k10temp' in keys:
                     key = 'k10temp'
 
-
                 cpuTemp = str(temps[key][0].current) + ' C'
                 output.append(indent + colorUnicode + '    temperature: ' + white + cpuTemp + down)
                 cache.append(indent + '{color_unicode}' + '    temperature: ' + white + '{cpu_temperature}' + down)
@@ -301,18 +293,24 @@ def makeNew(ignoreConf=False):
 
     if ignoreConf or show['storage']:
         try:
-            totalStorage = terminal('df -lh / | grep / -w | awk \'{ print $2 }\'')
-            if not 'not found' in totalStorage:
-                output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
-                cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
-                downCount += 1
-                down = '\n' if downCount >= height else down
+            totalStorage = terminal('df -lh /home | grep /home -w | awk \'{ print $2 }\'')
+            if not totalStorage:
+                totalStorage = terminal('df -lh / | grep / -w | awk \'{ print $2 }\'')
+
+            output.append(indent + colorUnicode + 'storage: ' + white + totalStorage + down)
+            cache.append(indent + '{color_unicode}' + 'storage: ' + white + totalStorage + down)
+
+            downCount += 1
+            down = '\n' if downCount >= height else down
 
         except: pass
 
         if ignoreConf or show['storage-usage']:
             try:
-                usedStorage = terminal('df -lh / | grep / -w | awk \'{ printf "%s (%s)", $5, $3 }\'')
+                usedStorage = terminal('df -lh /home | grep /home -w | awk \'{ printf "%s (%s)", $5, $3 }\'')
+                if not usedStorage:
+                    usedStorage = terminal('df -lh / | grep / -w | awk \'{ printf "%s (%s)", $5, $3 }\'')
+
                 if not 'not found' in usedStorage:
                     output.append(indent + colorUnicode + '    usage: ' + white + usedStorage + down)
                     cache.append(indent + '{color_unicode}' + '    usage: ' + white + '{used_storage}' + down)
@@ -351,8 +349,10 @@ def makeNew(ignoreConf=False):
         recvNow = psutil.net_io_counters().bytes_recv
         writtenNow = psutil.disk_io_counters().write_bytes
         redNow = psutil.disk_io_counters().read_bytes
+
     except:
         pass
+
     else:
         if ignoreConf or show['network-speed']:
             output.append(indent + colorUnicode + 'network speed: ' + white + down)
@@ -479,7 +479,15 @@ def printCached(color):
             try:
                 temps = psutil.sensors_temperatures()
                 keys = list(temps.keys())
-                cpuTemp = str(temps[keys[0]][0].current) + ' C'
+
+                key = keys[0]
+                if 'coretemp' in keys:
+                    key = 'coretemp'
+
+                elif 'k10temp' in keys:
+                    key = 'k10temp'
+
+                cpuTemp = str(temps[key][0].current) + ' C'
                 content = content.replace('{cpu_temperature}', cpuTemp)
             except: pass
 
@@ -517,8 +525,12 @@ def printCached(color):
             except: pass
 
         if show['storage'] and show['storage-usage']:
+            usedStorage = terminal('df -lh /home | grep /home -w | awk \'{ printf "%s (%s)", $5, $3 }\'')
+            if not usedStorage:
+                usedStorage = terminal('df -lh / | grep / -w | awk \'{ printf "%s (%s)", $5, $3 }\'')
+
             try:
-                content = content.replace('{used_storage}', terminal('df -lh / | grep / -w | awk \'{ printf "%s (%s)", $5, $3 }\''))
+                content = content.replace('{used_storage}', usedStorage)
             except: pass
 
         if show['processes']:

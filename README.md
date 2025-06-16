@@ -7,6 +7,8 @@ Features hardware and operative system centered information.
 Inspired by Neofetch and PowerLevel10k
 
 ## Install 
+Required packages: `python3 python3-pip python3-venv python3-psutil`
+
 To install sysfetch in your system, you need to execute "install.sh" file:
 
 ```commandline
@@ -15,12 +17,13 @@ $ ./install.sh update
 ```
 
 The installation script needs a parameter, which can either be "full" or "update":
-- if you choose "full":
-  - The script will create a folder called "sysfetch" in "/usr/share", and will copy "distros.py" into it. 
-  - The "sysfetch" main script will be copied into "/usr/local/bin".
+- if you choose "full": 
+  - Sysfetch source code gets compiled into an executable 
+  - The "sysfetch" executable will be copied into "/usr/local/bin"
   - A new folder named ".sysfetch" will be created in your home directory, in which there will be stored the configuration file and the cache file.
 - if you choose "update":
-  - The script will copy the latest version of "sysfetch" script into "/usr/local/bin"
+  - Sysfetch source code gets compiled into an executable 
+  - The "sysfetch" executable will be copied into "/usr/local/bin"
 
 At a certain point you will be prompted for your password, in order to give root privileges to the script,
 please DO NOT execute it as root beforehand.
@@ -85,7 +88,6 @@ To get help about usage, it is available the "--help" option:
 ```commandline
 $ sysfetch --help
 ```
-
 
 If you wish to set a personalised default behaviour, you can edit the configuration file
 located in "$HOME/.sysfetch/conf.json". 
