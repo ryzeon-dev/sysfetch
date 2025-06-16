@@ -2,7 +2,7 @@
 Command-line system information tool written in Python.\
 Features hardware and operative system centered information.
 
-![sample.png](screenshots/debian.png)
+![sample.png](sample.png)
 
 Inspired by Neofetch and PowerLevel10k
 
