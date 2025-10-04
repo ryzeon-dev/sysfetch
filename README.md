@@ -2,7 +2,7 @@
 Command-line system information tool written in Python.\
 Features hardware and operative system centered information.
 
-![sample.png](sample.png)
+![sysfetch.png](sysfetch.png)
 
 Inspired by Neofetch and PowerLevel10k
 
@@ -20,62 +20,19 @@ The installation script needs a parameter, which can either be "full" or "update
 - if you choose "full": 
   - Sysfetch source code gets compiled into an executable 
   - The "sysfetch" executable will be copied into "/usr/local/bin"
-  - A new folder named ".sysfetch" will be created in your home directory, in which there will be stored the configuration file and the cache file.
+  - A new folder named ".sysfetch" will be created in your home directory, in which there will be stored the configuration file
 - if you choose "update":
   - Sysfetch source code gets compiled into an executable 
   - The "sysfetch" executable will be copied into "/usr/local/bin"
 
-At a certain point you will be prompted for your password, in order to give root privileges to the script,
-please DO NOT execute it as root beforehand.
-
-It is also required to have installed the package "psutil", 
-which can be installed both by your distro's package manager or
-by pip
-
-```commandline
-$ pip install psutil
-```
+At a certain point you will be prompted for your password, in order to give root privileges to the script. \
+It is not suggested to run `install.sh` script as root, at it is blocked by default; hoewver it is possible to do so giving `--force` as first argument  
 
 ## Usage
 
 ```commandline
 $ sysfetch
 ```
-To decrease execution time, Sysfetch implements a cacheing method, 
-which locally stores all "static" data featured.
-
-If you want data to be recached, in case you changed something in 
-your device which concerns "static" data, simply use:
-
-```commandline
-$ sysfetch recache
-```
-It is a good practice to recache at least once a week.
-
-If you desire to use a color different from default one (purple), 
-you can change it by:
-
-```commandline
-$ sysfetch color aquagreen
-```
-
-Available colors:
-- grey
-- red
-- yellow
-- purple
-- green
-- lightblue
-- blue
-- orange
-- aquagreen
-
-In case you want to see only the information (and not the distro's ascii art):
-```commandline
-$ sysfetch no-ascii-art 
-```
-If you run this, the "no-ascii-art" behaviour will be cached. To revert it (and get back your ascii art), simply recache.
-
 
 To ignore your configuration file:
 ```commandline
@@ -90,67 +47,52 @@ $ sysfetch --help
 ```
 
 If you wish to set a personalised default behaviour, you can edit the configuration file
-located in "$HOME/.sysfetch/conf.json". 
-
-WARNING: do NOT delete any row or parameter in the configuration file, as it will cause sysfetch to crash. 
-In case you accidentally do, simply reinstall sysfetch specifying "full". 
+located in `$HOME/.sysfetch/conf.yaml`.
 
 Default configuration:
 
-```json
-{
-  "ascii-art" : "",
-  "separator-unicode" : "",
-  "default-color" : "",
-  "always-recache" : false,
-  "no-ascii-art" : false,
-  "show" : {
-    "os" : true,
-    "kernel" : true,
-    "shell" : true,
-    "cpu" : true,
-    "cpu-arch" : true,
-    "cpu-cores" : true,
-    "cpu-threads" : true,
-    "cpu-usage" : true,
-    "cpu-temp" : true,
-    "load" : true,
-    "ram" : true,
-    "ram-usage" : true,
-    "ram-cached" : true,
-    "swap" : true,
-    "swap-usage" : true,
-    "swap-cached" : true,
-    "storage" : true,
-    "storage-usage" : true,
-    "gpu" : true,
-    "processes" : true,
-    "ipv4" : true,
-    "network-speed" : true,
-    "upload-speed" : true,
-    "download-speed" : true,
-    "disk-speed" : true,
-    "writing-speed" : true,
-    "reading-speed" : true
-  }
-}
+```yaml
+ascii-art: default
+color: default
+unicode-logo: default
+
+os: yes
+kernel: yes
+shell: yes
+cpu: yes
+cpu-arch: yes
+cpu-cores: yes
+cpu-usage: yes
+cpu-temp: yes
+
+load: yes
+
+ram: yes
+ram-usage: yes
+ram-cached: yes
+
+swap: yes
+swap-usage: yes
+swap-cached: yes
+
+gpu: yes
+
+motherboard: yes
+motherboard-vendor: yes
+motherboard-version: yes
+motherboard-bios: yes
+
+processes: yes
+
+ipv4: yes
+
+net-rate: yes
 ```
-Setting as false any of the values in "show" section, removes the corresponding element from the displayed information.
-
-Leave blank if you want to keep the standard behaviour.
-
-Once done with conf.json, to load your changes it is required to recache.
-
-Available always-recache values:
-- true
-- false
-
-Available no-ascii-art values:
-- true
-- false
+Setting as `no` any of the values, removes the corresponding element from the displayed information. \
+Leave `yes` if you want to keep the standard behaviour.
 
 Available separator unicode:
-- `empty`
+- `default`
 - alpine
 - macos
 - arch
@@ -171,7 +113,7 @@ Available separator unicode:
 - tux
 
 Available colors:
-- `empty`
+- `default`
 - grey
 - red
 - yellow
@@ -183,7 +125,7 @@ Available colors:
 - aquagreen
 
 Available ascii-art:
-- `empty`
+- `default`
  - armbian
  - aix
  - alpine

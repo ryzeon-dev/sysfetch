@@ -1,0 +1,35 @@
+ascii-art: default
+color: default
+unicode-logo: default
+
+os: yes
+kernel: yes
+shell: yes
+cpu: yes
+cpu-arch: yes
+cpu-cores: yes
+cpu-usage: yes
+cpu-temp: yes
+
+load: yes
+
+ram: yes
+ram-usage: yes
+ram-cached: yes
+
+swap: yes
+swap-usage: yes
+swap-cached: yes
+
+gpu: yes
+
+motherboard: yes
+motherboard-vendor: yes
+motherboard-version: yes
+motherboard-bios: yes
+
+processes: yes
+
+ipv4: yes
+
+net-rate: yes
