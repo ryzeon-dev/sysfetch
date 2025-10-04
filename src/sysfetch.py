@@ -209,7 +209,7 @@ def makeNew(conf={}, ignoreConf=False):
             sysfetch.appendFmtLines('    cached', fmtRamCached)
 
     if ignoreConf or conf.get('swap'):
-        swap = sysutil.swapSize().fmt()
+        swap = sysutil.swapSize().fmt(2)
         sysfetch.appendFmtLines('swap', swap)
 
         if ignoreConf or conf.get('swap-usage'):
@@ -218,7 +218,7 @@ def makeNew(conf={}, ignoreConf=False):
 
         if ignoreConf or conf.get('swap-cached'):
             cachedSwap = sysutil.swapCached()
-            fmtSwapCached = cachedSwap.fmt()
+            fmtSwapCached = cachedSwap.fmt(2)
 
             sysfetch.appendFmtLines('    cached', fmtSwapCached)
 
