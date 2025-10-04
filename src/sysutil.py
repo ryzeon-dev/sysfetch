@@ -611,7 +611,7 @@ def swapUsagePercent():
         return 0
 
     swapUsage = swapFree * 100 / swapSizeBytes
-    return swapUsage
+    return 100 - swapUsage
 
 def swapCached():
     __linuxCheck()
