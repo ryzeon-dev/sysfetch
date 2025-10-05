@@ -870,7 +870,6 @@ def getIPv4():
     while index < len(lines):
         line = lines[index]
         chunks = line.split('\n')
-        print(chunks)
 
         if len(chunks) == 1 or ':' in line:
             index += 1
@@ -925,6 +924,3 @@ def getIPv4():
                 ))
 
     return ipv4Addresses
-
-if __name__ == '__main__':
-    print(getIPv4())
