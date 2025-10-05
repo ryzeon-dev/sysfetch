@@ -153,20 +153,21 @@ def makeNew(conf={}, ignoreConf=False):
         sysfetch.appendFmtLines('shell', shellVersion)
 
     if ignoreConf or conf.get('cpu'):
-        cpu = sysutil.CPU()
-        sysfetch.appendFmtLines('cpu', cpu.info.modelName)
+        cpuInfo = sysutil.cpuInfo()
+        sysfetch.appendFmtLines('cpu', cpuInfo.modelName)
 
         if ignoreConf or conf.get('cpu-arch'):
-            sysfetch.appendFmtLines('    architecture', cpu.info.architecture)
+            sysfetch.appendFmtLines('    architecture', cpuInfo.architecture)
 
         if ignoreConf or conf.get('cpu-cores'):
-            sysfetch.appendFmtLines('    cores', cpu.info.cores)
+            sysfetch.appendFmtLines('    cores', cpuInfo.cores)
 
         if ignoreConf or conf.get('cpu-threads'):
-            sysfetch.appendFmtLines('    threads', cpu.info.threads)
+            sysfetch.appendFmtLines('    threads', cpuInfo.threads)
 
         if ignoreConf or conf.get('cpu-usage'):
-            sysfetch.appendFmtLines('    usage', str(round(cpu.averageUsage.total, 2)) + '%')
+            cpuUsage = sysutil.cpuUsage()
+            sysfetch.appendFmtLines('    usage', str(round(cpuUsage.average.total, 2)) + '%')
 
         if ignoreConf or conf.get('cpu-temp'):
             sensors = sysutil.temperatureSensors()
@@ -184,11 +185,8 @@ def makeNew(conf={}, ignoreConf=False):
                 sysfetch.appendFmtLines('    temperature', str(cpuTempSensor.temperature) + ' C')
 
     if ignoreConf or conf.get('load'):
-        with open('/proc/loadavg', 'r') as file:
-            loadFileContent = file.read()
-
-        load = loadFileContent.split(' ')[0]
-        sysfetch.appendFmtLines('load', load)
+        load = sysutil.getLoad()
+        sysfetch.appendFmtLines('load', load.oneMinute)
     
     if ignoreConf or conf.get('ram'):
         ramSize = sysutil.ramSize()

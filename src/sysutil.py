@@ -1,24 +1,12 @@
 '''
 THIS FILE COMES FROM `sysutil-lib` package written by ryzeon-dev (me)
-This is a slightly modified version
+This is a stripped down version, only containing the code needed by sysfetch
 '''
 
 import dataclasses
 import os
 import sys
 import time
-
-
-class BatteryStatus:
-    Charging = 'charging'
-    Discharging = 'discharging'
-    Full = 'full'
-
-
-@dataclasses.dataclass
-class Battery:
-    capacity: int
-    status: str
 
 
 @dataclasses.dataclass
@@ -65,64 +53,6 @@ class CpuInfo:
 
 
 @dataclasses.dataclass
-class SchedulerPolicy:
-    name: str
-    scalingGovernor: str
-    scalingDriver: str
-    minimumScalingMHz: float
-    maximumScalingMHz: float
-
-
-@dataclasses.dataclass
-class Frequency:
-    _khz: float
-
-    def khz(self):
-        return self._khz
-
-    def mhz(self):
-        return self._khz / 1000
-
-    def ghz(self):
-        return self._khz / 1000_000
-
-
-@dataclasses.dataclass
-class ProcessorFrequency:
-    processorID: str
-    frequency: Frequency
-
-
-@dataclasses.dataclass
-class CPU:
-    info: CpuInfo
-    averageUsage: ProcessorUsage
-    perProcessorUsage: [ProcessorUsage]
-    schedulerPolicies: [SchedulerPolicy]
-    averageFrequency: Frequency
-    perProcessorFrequency: [ProcessorFrequency]
-
-    def __init__(self):
-        self.info = cpuInfo()
-
-        usage = cpuUsage()
-        self.averageUsage = usage.average
-        self.perProcessorUsage = usage.processors
-
-        self.schedulerPolicies = schedulerInfo()
-
-        frequency = cpuFrequency()
-        self.averageFrequency = frequency.average
-        self.perProcessorFrequency = cpuFrequency().processors
-
-    def update(self):
-        usage = cpuUsage()
-        self.averageUsage = usage.average
-        self.perProcessorUsage = usage.processors
-        self.schedulerPolicies = schedulerInfo()
-
-
-@dataclasses.dataclass
 class RamSize:
     gb: float
     gib: float
@@ -132,83 +62,6 @@ class RamSize:
 class VramSize:
     gb: float
     gib: float
-
-
-class RouteType:
-    TCP = 'tcp'
-    TCP6 = 'tcp6'
-    UDP = 'udp'
-    UDP6 = 'udp6'
-
-
-class RouteStatus:
-    ESTABLISHED = 'established'
-    SYN_SENT = 'syn sent'
-    SYN_RECEIVED = 'syn received'
-    FIN_WAIT1 = 'fin wait 1'
-    FIN_WAIT2 = 'fin wait 2'
-    TIME_WAIT = 'time wait'
-    CLOSED = 'closed'
-    CLOSE_WAIT = 'close wait'
-    LAST_ACKNOWLEDGEMENT = 'last acknowledgement'
-    LISTENING = 'listening'
-    CLOSING = 'closing'
-    NEW_SYN_RECEIVED = 'new syn received'
-
-    @staticmethod
-    def fromTcpCode(code):
-        if code == '01':
-            return RouteStatus.ESTABLISHED
-
-        elif code == '02':
-            return RouteStatus.SYN_SENT
-
-        elif code == '03':
-            return RouteStatus.SYN_RECEIVED
-
-        elif code == '04':
-            return RouteStatus.FIN_WAIT1
-
-        elif code == '05':
-            return RouteStatus.FIN_WAIT2
-
-        elif code == '06':
-            return RouteStatus.TIME_WAIT
-
-        elif code == '07':
-            return RouteStatus.CLOSED
-
-        elif code == '08':
-            return RouteStatus.CLOSE_WAIT
-
-        elif code == '09':
-            return RouteStatus.LAST_ACKNOWLEDGEMENT
-
-        elif code == '0A':
-            return RouteStatus.LISTENING
-
-        elif code == '0B':
-            return RouteStatus.CLOSING
-
-        elif code == '0C':
-            return RouteStatus.NEW_SYN_RECEIVED
-
-
-@dataclasses.dataclass
-class NetworkRoute:
-    routeType: str
-    localAddress: str
-    localPort: int
-    remoteAddress: str
-    remotePort: int
-    routeStatus: str
-
-
-@dataclasses.dataclass
-class ClockSource:
-    current: str
-    available: [str]
-
 
 @dataclasses.dataclass
 class Bios:
@@ -224,27 +77,6 @@ class Motherboard:
     vendor: str
     version: str
     bios: Bios
-
-
-@dataclasses.dataclass
-class GpuMetrics:
-    temperatureEdge: int
-    temperatureHotspot: int
-    temperatureMem: int
-    temperatureVrgfx: int
-    temperatureVrsoc: int
-    temperatureVrmem: int
-    averageSocketPower: int
-    averageGfxclkFrequency: int
-    averageSockclkFrequency: int
-    averageUclkFrequency: int
-    currentGfxclk: int
-    currentSockclk: int
-    throttleStatus: int
-    currentFanSpeed: int
-    pcieLinkWidth: int
-    pcieLinkSpeed: int
-
 
 @dataclasses.dataclass
 class ByteSize:
@@ -326,19 +158,6 @@ class StorageDevice:
     size: ByteSize
     partitions: [StoragePartition]
 
-
-@dataclasses.dataclass
-class CpuFrequency:
-    average: Frequency
-    processors: [ProcessorFrequency]
-
-
-@dataclasses.dataclass
-class Backlight:
-    brightness: int
-    maxBrightness: int
-
-
 @dataclasses.dataclass
 class Load:
     oneMinute: int
@@ -354,41 +173,9 @@ class IPv4:
     cidr: int
     netmask: str
 
-
-@dataclasses.dataclass
-class BusInput:
-    bus: int
-    vendor: int
-    product: int
-    version: int
-    name: str
-    physicalPath: str
-    sysfsPath: str
-    uniqueIdentifier: str
-    handles: [str]
-    properties: int
-    events: int
-    keys: [str]
-    miscellaneousEvents: int
-    led: int
-
-
-class InterfaceType:
-    PHYSICAL = 'physical'
-    VIRTUAL = 'virtual'
-
-
-@dataclasses.dataclass
-class NetowrkInterface:
-    name: str
-    macAddress: str
-    interfaceType: str
-
-
 def __linuxCheck():
     if not os.path.exists('/sys') or not os.path.exists('/proc'):
         raise Exception('Detected non-Linux system')
-
 
 def __readFile(filePath):
     try:
@@ -397,97 +184,6 @@ def __readFile(filePath):
 
     except:
         return ''
-
-
-def __batteryPath():
-    DRIVER_DIR = '/sys/class/power_supply'
-    batteries = []
-
-    for dir in os.listdir(DRIVER_DIR):
-        path = f'{DRIVER_DIR}/{dir}'
-
-        if 'type' not in os.listdir(path):
-            continue
-
-        with open(f'{path}/type', 'r') as type:
-            if type != 'Battery':
-                continue
-
-        if os.path.exists(f'{path}/status') and os.path.exists(f'{path}/capacity'):
-            batteries.append(path)
-
-    try:
-        battery = batteries[0]
-
-    except:
-        return None
-
-    return battery
-
-
-def batteryInfo():
-    __linuxCheck()
-
-    batteryPath = __batteryPath()
-
-    if batteryPath is None:
-        return None
-
-    try:
-        with open(f'{batteryPath}/capacity', 'r') as file:
-            capacity = file.read().strip()
-
-    except:
-        return None
-
-    else:
-        if not capacity:
-            return None
-
-    try:
-        capacity = int(capacity)
-    except:
-        capacity = None
-
-    try:
-        with open(f'{batteryPath}/status', 'r') as file:
-            status = file.read().strip()
-
-    except:
-        return None
-
-    else:
-        if not status:
-            return None
-
-    if status == 'Charging':
-        status = BatteryStatus.Charging
-
-    elif status == 'Discharging':
-        status = BatteryStatus.Discharging
-
-    elif status == 'Full':
-        status = BatteryStatus.Full
-
-    else:
-        status = None
-
-    return Battery(
-        capacity=capacity,
-        status=status
-    )
-
-
-def gpuUsage():
-    __linuxCheck()
-
-    try:
-        with open('/sys/class/drm/card0/device/gpu_busy_percent', 'r') as file:
-            return float(file.read().strip())
-
-    except:
-        return None
-
 
 def __getStats():
     with open('/proc/stat', 'r') as file:
@@ -509,7 +205,6 @@ def __getStats():
         intLines.append(intLine)
 
     return intLines
-
 
 def cpuUsage():
     __linuxCheck()
@@ -545,7 +240,6 @@ def cpuUsage():
         average=processors[0],
         processors=processors[1:]
     )
-
 
 def ramUsagePercent():
     __linuxCheck()
@@ -810,43 +504,6 @@ def ramSize():
     memBytes = memTotal * 1024
     return ByteSize(memBytes)
 
-def schedulerInfo():
-    __linuxCheck()
-
-    DRIVER_DIR = '/sys/devices/system/cpu/cpufreq'
-    policies = []
-
-    for dir in os.listdir(DRIVER_DIR):
-        if 'policy' not in dir:
-            continue
-
-        policyName = dir
-
-        with open(f'{DRIVER_DIR}/{dir}/scaling_governor', 'r') as file:
-            scalingGovernor = file.read().strip()
-
-        with open(f'{DRIVER_DIR}/{dir}/scaling_driver', 'r') as file:
-            scalingDriver = file.read().strip()
-
-        with open(f'{DRIVER_DIR}/{dir}/scaling_max_freq', 'r') as file:
-            scalingMaxFreq = int(file.read().strip())
-
-        with open(f'{DRIVER_DIR}/{dir}/scaling_min_freq', 'r') as file:
-            scalingMinFreq = int(file.read().strip())
-
-        policies.append(
-            SchedulerPolicy(
-                name=policyName,
-                scalingGovernor=scalingGovernor,
-                scalingDriver=scalingDriver,
-                minimumScalingMHz=scalingMinFreq,
-                maximumScalingMHz=scalingMaxFreq
-            )
-        )
-
-    return policies
-
-
 def vramSize():
     __linuxCheck()
 
@@ -894,114 +551,6 @@ def __bytesToAddress(address, separator):
 
     chunks = chunks[::-1]
     return separator.join(chunks)
-
-
-def __bytesToPort(port):
-    LSB = port[:2]
-    MSB = port[2:]
-
-    return (int(MSB, 16) << 8) + (int(LSB, 16))
-
-
-def __getRoutes(filePath, separator, routeType):
-    routes = []
-
-    try:
-        with open(filePath, 'r') as file:
-            fileContent = file.read()
-
-    except:
-        return []
-
-    for line in fileContent.split('\n'):
-        if ':' not in line:
-            continue
-
-        splittedLine = line.strip().split(' ')
-        local = splittedLine[1].split(':')
-        remote = splittedLine[2].split(':')
-
-        localAddress = __bytesToAddress(local[0], separator)
-        localPort = __bytesToPort(local[1])
-
-        remoteAddress = __bytesToAddress(remote[0], separator)
-        remotePort = __bytesToPort(remote[1])
-
-        statusCode = splittedLine[3]
-        if routeType in (RouteType.TCP, RouteType.TCP6):
-            status = RouteStatus.fromTcpCode(statusCode)
-
-        else:
-            status = RouteStatus.LISTENING
-
-        routes.append(
-            NetworkRoute(
-                routeType=routeType,
-                localAddress=localAddress,
-                localPort=localPort,
-                remoteAddress=remoteAddress,
-                remotePort=remotePort,
-                routeStatus=status
-            )
-        )
-
-    return routes
-
-
-def networkRoutes():
-    __linuxCheck()
-
-    routes = []
-
-    routes.extend(
-        __getRoutes(
-            '/proc/net/tcp', '.', RouteType.TCP
-        )
-    )
-
-    routes.extend(
-        __getRoutes(
-            '/proc/net/udp', '.', RouteType.UDP
-        )
-    )
-
-    routes.extend(
-        __getRoutes(
-            '/proc/net/tcp6', ':', RouteType.TCP6
-        )
-    )
-
-    routes.extend(
-        __getRoutes(
-            '/proc/net/udp6', ':', RouteType.UDP6
-        )
-    )
-
-    return routes
-
-
-def clockSource():
-    __linuxCheck()
-
-    currentClockSource = ''
-    try:
-        with open('/sys/devices/system/clocksource/clocksource0/current_clocksource', 'r') as file:
-            currentClockSource = file.read().strip()
-    except:
-        pass
-
-    availableClockSources = []
-    try:
-        with open('/sys/devices/system/clocksource/clocksource0/available_clocksource', 'r') as file:
-            availableClockSources = file.read().strip().split(' ')
-    except:
-        pass
-
-    return ClockSource(
-        current=currentClockSource,
-        available=availableClockSources
-    )
-
 
 def biosInfo():
     __linuxCheck()
@@ -1087,43 +636,6 @@ def __bytesToInt(bytes):
         res += byte << shift
 
     return res
-
-
-def gpuMetrics():
-    __linuxCheck()
-
-    try:
-        with open('/sys/class/drm/card0/device/gpu_metrics', 'rb') as file:
-            bytes = file.read()
-
-    except:
-        pass
-
-    if bytes[2] != 1:
-        return None
-
-    content = bytes[3]
-    bytes = bytes[4:]
-
-    return GpuMetrics(
-        temperatureEdge=__bytesToInt(bytes[0:2] if content else bytes[8:10]),
-        temperatureHotspot=__bytesToInt(bytes[2:4] if content else bytes[10:12]),
-        temperatureMem=__bytesToInt(bytes[4:6] if content else bytes[12:14]),
-        temperatureVrgfx=__bytesToInt(bytes[6:8] if content else bytes[14:16]),
-        temperatureVrsoc=__bytesToInt(bytes[8:10] if content else bytes[16:18]),
-        temperatureVrmem=__bytesToInt(bytes[10:12] if content else bytes[18:20]),
-        averageSocketPower=__bytesToInt(bytes[18:20] if content else bytes[26:28]),
-        averageGfxclkFrequency=__bytesToInt(bytes[36:38]),
-        averageSockclkFrequency=__bytesToInt(bytes[38:40]),
-        averageUclkFrequency=__bytesToInt(bytes[40:42]),
-        currentGfxclk=__bytesToInt(bytes[50:52]),
-        currentSockclk=__bytesToInt(bytes[52:54]),
-        throttleStatus=__bytesToInt(bytes[64:68]),
-        currentFanSpeed=__bytesToInt(bytes[68:70]),
-        pcieLinkWidth=__bytesToInt(bytes[70:72]),
-        pcieLinkSpeed=__bytesToInt(bytes[72:74]),
-    )
-
 
 def nvmeDevices():
     __linuxCheck()
@@ -1284,73 +796,6 @@ def storageDevices():
     devices.extend(nvmeDevices())
     return devices
 
-
-def cpuFrequency():
-    __linuxCheck()
-
-    totalFreq = 0
-    frequencies = []
-
-    fileContent = __readFile('/proc/cpuinfo')
-    for chunk in fileContent.split('\n\n'):
-        if not chunk or chunk == ' ':
-            continue
-
-        id = ''
-        freq = 0
-
-        for line in chunk.split('\n'):
-            if 'processor' in line:
-                id = line.strip().split(':')[-1]
-
-            elif 'cpu MHz' in line:
-                freq = float(line.strip().split(':')[-1])
-
-        if not id or freq == 0:
-            continue
-
-        totalFreq += freq * 1000
-        frequencies.append(
-            ProcessorFrequency(
-                processorID=id,
-                frequency=Frequency(
-                    _khz=freq * 1000
-                )
-            )
-        )
-
-    return CpuFrequency(
-        average=Frequency(
-            _khz=totalFreq * 1000 / len(frequencies)
-        ),
-        processors=frequencies
-    )
-
-
-def getBacklight():
-    baseDir = '/sys/class/backlight'
-    dirs = os.listdir(baseDir)
-    path = ''
-
-    for dir in dirs:
-        dirPath = os.path.join(baseDir, dir)
-        if os.path.exists(os.path.join(dirPath, 'brightness')) and os.path.exists(
-                os.path.join(dirPath, 'max_brightness')):
-            path = dirPath
-            break
-
-    if not path:
-        return None
-
-    with open(os.path.join(path, 'brightness'), 'r') as file:
-        brightness = int(file.read().strip().replace(',', '.'))
-
-    with open(os.path.join(path, 'max_brightness'), 'r') as file:
-        maxBrightness = int(file.read().strip().replace(',', '.'))
-
-    return Backlight(brightness, maxBrightness)
-
-
 def getLoad():
     with open('/proc/loadavg', 'r') as file:
         content = file.read()
@@ -1364,7 +809,7 @@ def getLoad():
 
 
 def __containsAddress(addresses, address):
-    for addr, broadcast, netmask, cidr in addresses:
+    for addr, netAddress, broadcast, netmask, cidr in addresses:
         if addr == address:
             return True
     return False
@@ -1398,32 +843,51 @@ def __netmaskFromCidr(cidr):
 
     return f'{mask[0]}.{mask[1]}.{mask[2]}.{mask[3]}'
 
+def __broadcastFromAddressAndNetmask(address, netmask):
+    intAddress = sum(int(octet) << (8 * i) for i, octet in enumerate(address.split('.')))
+    intReverseMask = ~sum(int(octet) << (8 * i) for i, octet in enumerate(netmask.split('.')))
+
+    intBroadcast = intAddress | intReverseMask
+
+    broadcastChunks = [0, 0, 0, 0]
+    broadcastChunks[0] = intBroadcast & 0xFF
+    broadcastChunks[1] = (intBroadcast >> 8) & 0xFF
+    broadcastChunks[2] = (intBroadcast >> 16) & 0xFF
+    broadcastChunks[3] = (intBroadcast >> 24) & 0xFF
+
+    return '.'.join(str(chunk) for chunk in broadcastChunks)
 
 def getIPv4():
     ipv4Addresses = []
-
-    interfaces = []
     addresses = []
 
     routes = __readFile("/proc/net/route")
     fibTrie = __readFile("/proc/net/fib_trie")
 
     index = 0
-    lines = fibTrie.split('|--')
+    lines = fibTrie.split('+--')
 
     while index < len(lines):
         line = lines[index]
         chunks = line.split('\n')
+        print(chunks)
 
-        address = chunks[0].strip()
-        addressType = chunks[1].strip()
+        if len(chunks) == 1 or ':' in line:
+            index += 1
+            continue
 
-        if '/32 host LOCAL' in addressType and not __containsAddress(addresses, address):
-            broadcast = lines[index + 1].split('\n')[0].strip()
-            cidr = lines[index - 1].split('\n')[1].strip().split(' ')[0].replace('/', '').strip()
+        networkBaseAddress = chunks[0].strip().split(' ')[0]
 
-            mask = __netmaskFromCidr(cidr)
-            addresses.append((address, broadcast, cidr, mask))
+        cidr = networkBaseAddress.split('/')[1]
+        netAddress = networkBaseAddress.split('/')[0]
+
+        mask = __netmaskFromCidr(cidr)
+        broadcast = __broadcastFromAddressAndNetmask(netAddress, mask)
+
+        address = chunks[1].strip().replace('|--', '').strip()
+
+        if not __containsAddress(addresses, address):
+            addresses.append((address, netAddress, broadcast, cidr, mask))
 
         index += 1
 
@@ -1432,6 +896,8 @@ def getIPv4():
             continue
 
         splittedLine = line.split('\t')
+        if int(splittedLine[3]) == 3:
+            continue
         device = splittedLine[0].strip()
 
         network = __bytesToAddress(splittedLine[1], '.')
@@ -1441,13 +907,8 @@ def getIPv4():
         mask = None
         cidr = None
 
-        for address, broadcast, cidrAddr, netmask in addresses:
-            addressNetwork = address.strip().split('.')
-
-            addressNetwork[3] = '0'
-            addressNetwork = '.'.join(addressNetwork)
-
-            if network == addressNetwork:
+        for address, netAddres, broadcast, cidrAddr, netmask in addresses:
+            if network == netAddres:
                 ip = address
                 brd = broadcast
                 cidr = cidrAddr
@@ -1465,368 +926,5 @@ def getIPv4():
 
     return ipv4Addresses
 
-
-def busInput():
-    inputs = []
-
-    with open('/proc/bus/input/devices', 'r') as file:
-        fileContent = file.read()
-
-    for chunk in fileContent.split('\n\n'):
-        if not chunk.strip():
-            continue
-
-        bus = None
-        vwndor = None
-        version = None
-        product = None
-        name = None
-        physicalPath = None
-        sysfsPath = None
-        uniqueIdentifier = None
-        handlees = []
-        properties = None
-        events = None
-        miscellaneousEvents = None
-        led = None
-        keys = []
-
-        for line in chunk.strip().split('\n'):
-
-            if 'I: ' in line:
-                for block in line.strip().split(' '):
-                    if 'Bus=' in block:
-                        bus = int(block.replace('Bus=', ''), 16)
-
-                    elif 'Vendor=' in block:
-                        vendor = int(block.replace('Vendor=', ''), 16)
-
-                    elif 'Version=' in block:
-                        version = int(block.replace('Version=', ''), 16)
-
-                    elif 'Product=' in block:
-                        product = int(block.replace('Product=', ''), 16)
-
-            elif (target := 'N: Name=') in line:
-                name = line.replace(target, '').replace('"', '')
-
-            elif (target := 'P: Phys=') in line:
-                physicalPath = line.replace(target, '')
-
-            elif (target := 'S: Sysfs=') in line:
-                sysfsPath = line.replace(target, '')
-
-            elif (target := 'U: Uniq=') in line:
-                uniqueIdentifier = line.replace(target, '')
-
-            elif (target := 'H: Handlers=') in line:
-                handlersList = line.replace(target, '').split(' ')
-                handles = []
-
-                for handler in handlersList:
-                    handles.append(handler)
-
-            elif (target := 'B: PROP=') in line:
-                properties = int(line.replace(target, ''), 16)
-
-            elif (target := 'B: EV=') in line:
-                events = int(line.replace(target, ''), 16)
-
-            elif (target := 'B: MSC=') in line:
-                miscellaneousEvents = int(line.replace(target, ''), 16)
-
-            elif (target := 'B: LED=') in line:
-                led = int(line.replace(target, ''), 16)
-
-            elif (target := 'B: KEY=') in line:
-                keys = []
-
-                for key in line.replace(target, '').split(' '):
-                    keys.append(key)
-
-        inputs.append(BusInput(
-            bus=bus,
-            vendor=vendor,
-            product=product,
-            version=version,
-            name=name,
-            physicalPath=physicalPath,
-            sysfsPath=sysfsPath,
-            uniqueIdentifier=uniqueIdentifier,
-            handles=handles,
-            properties=properties,
-            events=events,
-            keys=keys,
-            miscellaneousEvents=miscellaneousEvents,
-            led=led
-        ))
-
-    return inputs
-
-
-def networkInterfaces():
-    baseDirectory = '/sys/class/net'
-    interfaces = []
-
-    for directory in os.listdir(baseDirectory):
-        name = directory
-        path = f'{baseDirectory}/{name}'
-
-        with open(f'{path}/address', 'r') as file:
-            mac = file.read().strip()
-
-        interfaceType = InterfaceType.VIRTUAL
-        directoryContent = os.listdir(path)
-
-        if 'phydev' in directoryContent or 'phy80211' in directoryContent:
-            interfaceType = InterfaceType.PHYSICAL
-
-        interfaces.append(NetowrkInterface(name=name, macAddress=mac, interfaceType=interfaceType))
-
-    return interfaces
-
-
-def exportJson():
-    json = {}
-
-    def processorUsageToJson(usage):
-        return {
-            'total': usage.total,
-            'user': usage.user,
-            'nice': usage.nice,
-            'system': usage.system,
-            'idle': usage.idle,
-            'iowait': usage.iowait,
-            'interrupt': usage.interrupt,
-            'soft-interrupt': usage.soft_interrupt
-        }
-
-    def schedulerPolicyToJson(sched):
-        return {
-            'scaling-governor': sched.scalingGovernor,
-            'scaling-driver': sched.scalingDriver,
-            'minimum-scaling-mhz': sched.minimumScalingMHz,
-            'maximum-scaling-mhz': sched.maximumScalingMHz
-        }
-
-    def partitionToJson(partition: StoragePartition):
-        return {
-            'device': partition.device,
-            'mount-point': partition.mountPoint,
-            'filesystem': partition.filesystem,
-            'size': partition.size,
-            'start-point': partition.startPoint
-        }
-
-    def nvmeDeviceToJson(device: NvmeDevice):
-        return {
-            'device': device.device,
-            'pcie-address': device.pcieAddress,
-            'model': device.model,
-            'link-speed-gts': device.linkSpeedGTs,
-            'pcie-lanes': device.pcieLanes,
-            'size': device.size,
-            'partitions': [partitionToJson(partition) for partition in device.partitions]
-        }
-
-    def storageDeviceToJson(device: StorageDevice):
-        return {
-            'device': device.device,
-            'model': device.model,
-            'size': device.size,
-            'partitions': [partitionToJson(partition) for partition in device.partitions]
-        }
-
-    def networkRouteToJson(route: NetworkRoute):
-        return {
-            'type': route.routeType,
-            'local-address': route.localAddress,
-            'local-port': route.localPort,
-            'remote-address': route.remoteAddress,
-            'remote-port': route.remotePort,
-            'status': route.routeStatus
-        }
-
-    cpu = CPU()
-    cpuClockSource = clockSource()
-
-    json['cpu'] = {
-        'model-name': cpu.info.modelName,
-        'cores': cpu.info.cores,
-        'threads': cpu.info.threads,
-        'dies': cpu.info.dies,
-        'governors': cpu.info.governors,
-        'max-frequency': cpu.info.maxFrequencyMHz,
-        'clock-boost': cpu.info.clockBoost,
-        'architecture': cpu.info.architecture,
-        'byte-order': cpu.info.byteOrder,
-        'usage': processorUsageToJson(cpu.averageUsage),
-        'scheduler-policies': {sched.name: schedulerPolicyToJson(sched) for sched in cpu.schedulerPolicies},
-        'frequency': cpu.averageFrequency.khz(),
-        'clock-source': {
-            'current': cpuClockSource.current,
-            'available': cpuClockSource.available
-        }
-    }
-
-    json['ram'] = {
-        'usage': ramUsagePercent(),
-        'size-gb': ramSize().gb,
-        'size-gib': ramSize().gib
-    }
-
-    moboInfo = motherboardInfo()
-    json['motherboard'] = {
-        'name': moboInfo.name,
-        'vendor': moboInfo.vendor,
-        'version': moboInfo.version,
-        'bios': {
-            'vendor': moboInfo.bios.vendor,
-            'release': moboInfo.bios.release,
-            'version': moboInfo.bios.version,
-            'date': moboInfo.bios.date
-        }
-    }
-
-    nvmeDevicesList = nvmeDevices()
-    json['nvme-devices'] = [nvmeDeviceToJson(device) for device in nvmeDevicesList]
-
-    storageDevicesList = storageDevices()
-    json['storage-devices'] = [storageDeviceToJson(device) for device in storageDevicesList]
-
-    battery = batteryInfo()
-    json['battery'] = {'status': battery.status, 'capacity': battery.capacity} if battery else None
-
-    backlight = getBacklight()
-    json['backlight'] = {
-        'brightness': backlight.brightness, 'max-brightness': backlight.maxBrightness
-    } if backlight else None
-
-    rate = networkRate()
-    routes = networkRoutes()
-
-    json['network'] = {
-        'rate': {
-            'upload': rate.upload,
-            'download': rate.download
-        },
-        'routes': [networkRouteToJson(route) for route in routes]
-    }
-
-    tempSensors = temperatureSensors()
-    json['temperature-sensors'] = [
-        {'label': sensor.label, 'temperature': sensor.temperature} for sensor in tempSensors
-    ]
-
-    json['vram-size'] = {
-        'gb': vramSize().gb,
-        'gib': vramSize().gib
-    }
-
-    metrics = gpuMetrics()
-    json['gpu-metrics'] = {
-        'temperature-edge': metrics.temperatureEdge,
-        'temperature-hotspot': metrics.temperatureHotspot,
-        'temperature-mem': metrics.temperatureMem,
-        'temperature-vrgfx': metrics.temperatureVrgfx,
-        'temperature-vrsoc': metrics.temperatureVrsoc,
-        'temperature-vrmem': metrics.temperatureVrmem,
-        'average-socket-power': metrics.averageSocketPower,
-        'average-gfxclk-frequency': metrics.averageGfxclkFrequency,
-        'average-sockclk-frequency': metrics.averageSockclkFrequency,
-        'average-uclk-frequency': metrics.averageUclkFrequency,
-        'current-gfxclk': metrics.currentGfxclk,
-        'current-sockclk': metrics.currentSockclk,
-        'throttle-status': metrics.throttleStatus,
-        'current-fan-speed': metrics.currentFanSpeed,
-        'pcie-link-width': metrics.pcieLinkWidth,
-        'pcie-link-speed': metrics.pcieLinkSpeed
-    }
-
-    load = getLoad()
-    json['load'] = {
-        'one-minute': load.oneMinute,
-        'five-minutes': load.fiveMinutes,
-        'fifteen-minutes': load.fifteenMinutes
-    }
-
-    ipv4Addresses = getIPv4()
-    json['ipv4'] = [
-        {
-            'address': address.address,
-            'interface': address.interface,
-            'broadcast': address.broadcast,
-            'cidr': address.cidr,
-            'netmask': address.netmask
-        } for address in ipv4Addresses
-    ]
-
-    busInputs = busInput()
-    json['bus-input'] = []
-    for bus in busInputs:
-        json['bus-input'].append(
-            {
-                'bus': bus.bus,
-                'vendor': bus.vendor,
-                'product': bus.product,
-                'version': bus.version,
-                'physical-path': bus.physicalPath,
-                'sysfs-path': bus.sysfsPath,
-                'name': bus.name,
-                'handles': bus.handles,
-                'properties': bus.properties,
-                'events': bus.events,
-                'keys': bus.keys,
-                'miscellaneous-events': bus.miscellaneousEvents,
-                'led': bus.led
-            }
-        )
-
-    json['network-interfaces'] = {}
-    for interface in networkInterfaces():
-        json['network-interfaces'][interface.name] = {
-            'mac': interface.macAddress,
-            'interface-type': interface.interfaceType
-        }
-
-    return json
-
-
 if __name__ == '__main__':
-    print(cpuUsage())
-    print(f'RAM usage:', ramUsagePercent())
-
-    print(networkRate())
-    print(f'GPU usage:', gpuUsage())
-
-    print(temperatureSensors())
-    print(cpuInfo())
-
-    print(ramSize())
-    print(schedulerInfo())
-
-    print(batteryInfo())
-    print(vramSize())
-
-    print('VRAM usage:', vramUsage())
-    print(networkRoutes())
-
-    print(CPU())
-    print(cpuFrequency())
-
-    print(clockSource())
-    print(motherboardInfo())
-
-    print(gpuMetrics())
-    print(storageDevices())
-
-    print(nvmeDevices())
-    print(getBacklight())
-
-    print(getLoad())
     print(getIPv4())
-
-    print(networkInterfaces())
-
-    print(busInput())
-    print(exportJson())
