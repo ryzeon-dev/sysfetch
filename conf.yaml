@@ -8,6 +8,7 @@ shell: yes
 cpu: yes
 cpu-arch: yes
 cpu-cores: yes
+cpu-threads: yes
 cpu-usage: yes
 cpu-temp: yes
 
